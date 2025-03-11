@@ -3,10 +3,10 @@ import { Booking } from "../model/booking.model.js";
 export const Booked = async (req, res) => {
   const { date, customerId, sellerId, serviceId } = req.body;
 
-  if (!date || !customerId || !sellerId || !serviceId) {
-    return res.status(404).json({
+  if (!date || !customerId || !sellerId || !serviceId || !Array.isArray(date) || date.length === 0) {
+    return res.status(400).json({
       success: false,
-      message: "Please fill in all required fields",
+      message: "Please provide at least one date, along with customer and seller IDs.",
     });
   }
 
@@ -32,7 +32,6 @@ export const Booked = async (req, res) => {
 };
 
 export const viewSellerBookings = async (req, res) => {
-  
   try {
     const { sellerId } = req.params;
   

@@ -23,13 +23,12 @@ const CServiceDetails = () => {
 
   const [service, setService] = useState({});
   const { serviceId } = useParams();
-  const [date, setDate] = useState(new Date());
   const [bookedDates, setBookedDates] = useState([]);
-  const [selectedDates, setSelectedDates] = useState([])
+  const [selectedDates, setSelectedDates] = useState([]); // Store selected date range
   
   const { currentUser } = useSelector((state) => state.user);
-  const customerId = currentUser._id;
-  const sellerId = service.seller?._id;
+  const customerId = currentUser?._id;
+  const sellerId = service?.seller?._id;
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
 
 
@@ -50,10 +49,9 @@ const CServiceDetails = () => {
       });
       const data = res.data.data;
 
-      // Convert dates to YYYY-MM-DD format for comparison
-      const formattedDates = data.map(
-        (booking) => new Date(booking.date).toISOString().split("T")[0]
-      );
+      const formattedDates = data
+      .flatMap((booking) => booking.date) // Extract and flatten dates
+      .map((date) => new Date(date).toISOString().split("T")[0]); // Format YYYY-MM-DD
 
       setBookedDates(formattedDates);
     } catch (error) {
@@ -61,16 +59,37 @@ const CServiceDetails = () => {
     }
   };
 
-  const handleBookDate = async () => {
+  // Handle multiple date selection
+  const handleSelectDate = (date) => {
     const formattedDate = date.toISOString().split("T")[0];
 
-    if (isDateBooked(date)) {
+    // Prevent selecting already booked dates
+    if (bookedDates.includes(formattedDate)) {
       toast.error("This date is already booked. Please select another date.", {
         position: "top-center",
         autoClose: 1500,
       });
       return;
     }
+
+    // Toggle selection (add/remove date)
+    setSelectedDates((prevSelected) =>
+      prevSelected.includes(formattedDate)
+        ? prevSelected.filter((d) => d !== formattedDate) // Remove if already selected
+        : [...prevSelected, formattedDate] // Add new date
+    );
+  };
+
+  // Handle booking of multiple selected dates
+  const handleBookDate = async () => {
+    if (selectedDates.length === 0) {
+      toast.error("Please select at least one date before booking.", {
+        position: "top-center",
+        autoClose: 1500,
+      });
+      return;
+    }
+
     try {
       const res = await axios.post(
         `${apiUrl}/api/book`,
@@ -78,21 +97,24 @@ const CServiceDetails = () => {
           sellerId: sellerId,
           customerId: customerId,
           serviceId: serviceId,
-          date: formattedDate,
+          date: selectedDates, // Send all selected dates
         },
         { withCredentials: true }
       );
 
       if (res.data.success) {
-        toast.success("Date booked successfully!", {
+        toast.success("Dates booked successfully!", {
           position: "top-center",
           autoClose: 1500,
         });
-        setBookedDates([...bookedDates, formattedDate]);
+
+        // Add newly booked dates to state
+        setBookedDates([...bookedDates, ...selectedDates]);
+        setSelectedDates([]); // Reset selection
       }
     } catch (error) {
-      console.log("Failed to book date:", error);
-      toast.error("Failed to book date", {
+      console.log("Failed to book dates:", error);
+      toast.error("Failed to book dates", {
         position: "top-center",
         autoClose: 1500,
       });
@@ -103,6 +125,19 @@ const CServiceDetails = () => {
     const formattedDate = date.toISOString().split("T")[0]; // Convert to YYYY-MM-DD
     return bookedDates.includes(formattedDate);
   };
+
+   // Check if date is selected
+  const isDateSelected = (date) => {
+    const formattedDate = date.toISOString().split("T")[0];
+    return selectedDates.includes(formattedDate);
+  };
+
+  const isPastDate = (date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set time to start of day for accurate comparison
+    return date < today; // Returns true if the date is in the past
+  };
+  
 
   useEffect(() => {
     fetchService();
@@ -166,14 +201,17 @@ const CServiceDetails = () => {
             </div>
             <div className="mb-4">
               <Calendar
-                onChange={setDate}
-                value={date}
+                onClickDay={handleSelectDate} // Click to select multiple dates
                 tileClassName={({ date }) =>
-                  isDateBooked(date)
-                    ? "bg-red-500 text-white cursor-not-allowed"
-                    : "bg-green-200"
+                  isPastDate(date) // Check if past date
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed" // Gray out past dates
+                    : isDateBooked(date)
+                    ? "bg-red-500 text-white cursor-not-allowed" // Booked dates
+                    : isDateSelected(date)
+                    ? "bg-blue-400 text-white" // Selected dates
+                    : "bg-green-200" // Available dates
                 }
-                tileDisabled={({ date }) => isDateBooked(date)}
+                tileDisabled={({ date }) => isPastDate(date) || isDateBooked(date)} // Disable past and booked dates
               />
             </div>
             <div className="mb-4">
