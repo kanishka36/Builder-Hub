@@ -22,15 +22,18 @@ import AAddSellerRole from "./pages/Admin/AAddSellerRole";
 import ASellerRole from "./pages/Admin/ASellerRole";
 import CSupplierShop from "./pages/Customer/CSupplierShop";
 import Bookings from "./pages/Seller/service/Bookings";
+import CustomerPrivateRoutes from "./components/routes/CustomerPrivateRoutes";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         {/* customer  */}
+        <Route element={<CustomerPrivateRoutes />}>
+          <Route path="/services/:serviceId" element={<CustomerLayout component={CServiceDetails} />} /> 
+        </Route>
         <Route path="/" element={<CustomerLayout component={Home} />} />
         <Route path="/services" element={<CustomerLayout component={CServices} />} />
-        <Route path="/services/:serviceId" element={<CustomerLayout component={CServiceDetails} />} />
         <Route path="/suppliers" element={<CustomerLayout component={CSuppliers} />} />
         <Route path="/suppliers/:id" element={<CustomerLayout component={CSupplierShop} />} />
         <Route path="/sign-up" element={<AuthLayout component={Register} />} />

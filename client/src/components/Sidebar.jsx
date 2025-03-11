@@ -1,22 +1,28 @@
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { authenticateFailure, signOutSuccess } from "../redux/user/userSlice";
+import axios from "axios";
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
+  const { currentUser } = useSelector((state) => state.user);
+  const role = currentUser.category || currentUser.role;
   const [openMenus, setOpenMenus] = useState({});
-  const role = "super-admin";
+
+  console.log(role, "role")
 
   const menu = [
     { name: "My Profile", path: "/dashboard/my-profile" },
     { name: "Service Manage", path: "/dashboard/services" },
-    { name: "Order Manage", path: "/dashboard/orders" },
-    { name: "Bookings", path: "/dashboard/bookings" },
-    { name: "Inquiries", path: "/dashboard/inquiries" },
-    { name: "Rating & Reviews", path: "/dashboard/rating" },
-    { name: "Analytics", path: "/dashboard/analytics" },
-    ...(role !== "admin"
+    ...(role == "supplier" ? [
+      { name: "Order Manage", path: "/dashboard/orders" },
+    ]:[]),
+    ...(role == "service-provider" ? [
+      { name: "Bookings", path: "/dashboard/bookings" },
+    ]:[]),
+    ...(role == "admin"
       ? [
           { name: "Admins", path: "/admins" },
-          { name: "Organization", path: "/organization" },
           { name: "Users", path: "/users" },
           {
             name: "Seller",
@@ -28,6 +34,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           },
         ]
       : []),
+    { name: "Inquiries", path: "/dashboard/inquiries" },
+    { name: "Rating & Reviews", path: "/dashboard/rating" },
+    { name: "Analytics", path: "/dashboard/analytics" },
   ];
 
   const toggleMenu = (menuName) => {
@@ -35,6 +44,22 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       ...prev,
       [menuName]: !prev[menuName],
     }));
+  };
+
+  const apiUrl = import.meta.env.VITE_ROUTE_URL;
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const logout = async () => {
+    try {
+      await axios.post(`${apiUrl}/api/logout`, {}, { withCredentials: true });
+      dispatch(signOutSuccess());
+      dispatch(authenticateFailure());
+      navigate("/seller/sign-in");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -109,7 +134,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
         </nav>
 
         <div className="p-4 border-t border-bg-color">
-          <button className="flex gap-3 w-full text-left px-3 py-2 rounded hover:bg-bg-color hover:text-black">
+          <button 
+            onClick={logout}
+            className="flex gap-3 w-full text-left px-3 py-2 rounded hover:bg-bg-color hover:text-black"
+          >
             <div className="">Logout</div>
             <div className=""></div>
           </button>
