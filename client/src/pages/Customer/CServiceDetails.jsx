@@ -64,14 +64,10 @@ const CServiceDetails = () => {
       });
       const data = res.data.data;
 
-      console.log(data, "dates")
+      const formattedDates = data
+      .flatMap((booking) => booking.date) // Extract and flatten dates
+      .map((date) => new Date(date).toISOString().split("T")[0]); // Format YYYY-MM-DD
 
-      // Convert dates to YYYY-MM-DD format for comparison
-      const formattedDates = data.map(
-        (booking) => new Date(booking.date).toISOString().split("T")[0]
-      );
-
-      console.log("Fetched booked dates:", formattedDates);
       setBookedDates(formattedDates);
     } catch (error) {
       console.log("Failed to fetch booked dates:", error);
