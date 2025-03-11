@@ -37,8 +37,6 @@ const Dashboard = () => {
   const handleSubmit = async (values) => {
     console.log("Updated Profile Data:", values);
 
-    const imageUrl = values.images.length > 0 ? values.images[0] : "";
-
     try {
       const res = await axios.put(
         `${apiUrl}/api/edit-seller/${currentUser._id}`,

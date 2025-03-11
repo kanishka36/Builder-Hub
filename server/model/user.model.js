@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import {Booking} from "./booking.model.js"
 
 // Define the User Schema
 const userSchema = new mongoose.Schema(
@@ -54,5 +55,18 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Cascade delete bookings when a user is deleted.
+userSchema.pre("findOneAndDelete", async function (next) {
+  try {
+    const user = await this.model.findOne(this.getFilter());
+    if (user) {
+      await Booking.deleteMany({ customer: user._id });
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
 export const User = mongoose.model("User", userSchema);

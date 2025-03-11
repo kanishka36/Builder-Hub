@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { Service } from "./service.model.js";
+import { Booking } from "./booking.model.js";
 
 // Define the Seller Schema
 const sellerSchema = new mongoose.Schema(
@@ -61,5 +63,30 @@ const sellerSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Cascade delete Services and Bookings when a Seller is deleted
+sellerSchema.pre("deleteOne", { document: true, query: false }, async function (next) {
+  try {
+    await Service.deleteMany({ seller: this._id });
+    await Booking.deleteMany({ seller: this._id });
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Cascade delete services and bookings when a seller is deleted.
+sellerSchema.pre("findOneAndDelete", async function (next) {
+  try {
+    const seller = await this.model.findOne(this.getFilter());
+    if (seller) {
+      await Booking.deleteMany({ seller: seller._id });
+      await Service.deleteMany({ seller: seller._id});
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
 export const Seller = mongoose.model("Seller", sellerSchema);
