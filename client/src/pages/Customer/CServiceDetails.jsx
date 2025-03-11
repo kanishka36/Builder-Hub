@@ -8,21 +8,6 @@ import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 
 const CServiceDetails = () => {
-  const service2 = {
-    title: "I will design modern minimalist luxury business logo design",
-    seller: {
-      name: "Luna",
-      ordersInQueue: 4,
-      rating: 5.0,
-      reviews: 201,
-      profileImage: "/images/luna-profile.png",
-    },
-    media: {
-      video: "/videos/astrojuice.mp4",
-      image: "/images/astrojuice.png",
-    },
-  };
-
   const review = {
     username: "Johnolszew",
     country: "Canada",
