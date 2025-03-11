@@ -76,7 +76,9 @@ const Bookings = () => {
                   </div>
                   <p className="text-sm text-gray-600">{booking.service.title || "Unknown Service"}</p>
                   <p className="text-xs text-gray-500">
-                    📅 {new Date(booking.date).toISOString().split("T")[0]}
+                  📅 {booking.date.map((date, index) => (
+                        <span key={index}>{new Date(date).toISOString().split("T")[0]}{index !== booking.date.length - 1 ? ", " : ""}</span>
+                      ))}
                   </p>
                 </li>
               ))
@@ -105,7 +107,9 @@ const Bookings = () => {
                 <p><strong>Description:</strong> {selectedBooking.service.description || "No Description"}</p>
                 <p><strong>Price:</strong> {selectedBooking.service.price || "No price"}</p>
                 <p className="text-sm text-gray-500">
-                  📅 {new Date(selectedBooking.date).toISOString().split("T")[0]}
+                  {selectedBooking.date.map((date, index) => (
+                    <span key={index}>{new Date(date).toISOString().split("T")[0]}{index !== selectedBooking.date.length - 1 ? ", " : ""}</span>
+                  ))}
                 </p>
                 {selectedBooking.paid && (
                   <span className="text-green-600 font-bold">💲 Paid</span>
