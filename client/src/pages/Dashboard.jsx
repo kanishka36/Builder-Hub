@@ -1,34 +1,153 @@
-import React from "react";
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
 import Card from "../components/Card";
 import ActionButton from "../components/Button/ActionButton";
-import { useSelector } from "react-redux";
+import TextField from "../components/Form/TextField";
+import FileUpload from "../components/Form/FileUpload";
+import axios from "axios";
+import { updateSellerSuccess } from "../redux/user/userSlice";
 
 const Dashboard = () => {
   const { currentUser } = useSelector((state) => state.user);
+  const [isEditing, setIsEditing] = useState(false);
+  const apiUrl = import.meta.env.VITE_ROUTE_URL;
+  const dispatch = useDispatch();
+
+  // Initial values for Formik
+  const initialValues = {
+    images: currentUser?.imageUrl || [],
+    username: currentUser?.username || "",
+    email: currentUser?.email || "",
+    address: currentUser?.address || "",
+    phoneNumber: currentUser?.phoneNumber || "",
+  };
+
+  const validationSchema = Yup.object().shape({
+    username: Yup.string().required("Username is required"),
+    email: Yup.string().email("Invalid email").required("Email is required"),
+    address: Yup.string().notRequired(),
+    phoneNumber: Yup.string()
+      .matches(/^\d{10}$/, "Phone number must be 10 digits")
+      .notRequired(),
+  });
+
+  // Handle form submission
+  const handleSubmit = async (values) => {
+    console.log("Updated Profile Data:", values);
+
+    const imageUrl = values.images.length > 0 ? values.images[0] : "";
+
+    try {
+      const res = await axios.put(
+        `${apiUrl}/api/edit-seller/${currentUser._id}`,
+        {
+          username: values.username,
+          email: values.email,
+          address: values.address,
+          phoneNumber: values.phoneNumber,
+          imageUrl: values.imageUrl,
+        },
+        { withCredentials: true }
+      );
+      const data = res.data.data;
+      dispatch(updateSellerSuccess(data));
+      setIsEditing(false);
+      console.log(data, "updated seller data");
+    } catch (error) {
+      console.log("Failed to update seller:", error);
+    }
+  };
+
 
   return (
     <div className="container mx-auto">
       <div className="text-2xl font-semibold">My Profile</div>
 
       <Card className="p-4 mt-6">
-        <div className="text-xl font-semibold">Personal Profile</div>
-        <div className="mt-4 flex items-center space-x-4">
-          <div className="w-20 h-20 bg-gray-300 rounded-full"></div>
-          <div>
-            <div className="text-lg font-medium">{currentUser?.username}</div>
-            <div className="text-sm text-gray-600">{currentUser?.email}</div>
-            <div className="text-sm text-gray-600">
-              {currentUser?.address && currentUser.address.length > 0
-                ? currentUser.address
-                : "N/A"}
-            </div>
-            <div className="text-sm text-gray-600">
-              {currentUser?.phoneNumber && currentUser.phoneNumber.length > 0
-                ? currentUser.phoneNumber
-                : "N/A"}
-            </div>
+        <div className="flex gap-3">
+          <div className="text-xl font-semibold">Personal Profile</div>
+          <div className="">
+            <ActionButton
+              className="ml-auto"
+              name={isEditing ? "Cancel" : "Edit"}
+              onClick={() => setIsEditing(!isEditing)}
+            />
           </div>
-          <ActionButton className="ml-auto" name={"Edit"} />
+        </div>
+        <div className="w-20 h-20 bg-gray-300 rounded-full overflow-hidden">
+          {currentUser?.imageUrl ? (
+            <img
+              src={currentUser.imageUrl}
+              alt="Profile"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <span className="text-sm text-gray-500 flex items-center justify-center h-full">
+              No Image
+            </span>
+          )}
+        </div>
+        <div className="flex">
+          {isEditing ? (
+            <Formik
+              initialValues={initialValues}
+              validationSchema={validationSchema}
+              onSubmit={handleSubmit}
+            >
+              {({ setFieldValue, isSubmitting }) => (
+                <Form className="space-y-2">
+                  <div>
+                    <FileUpload
+                      name="images"
+                      label={"Uploade Profile Picture"}
+                      onUploadComplete={(uploadedURLs) => {
+                        console.log("Uploaded URLs:", uploadedURLs); // Debugging
+                        setFieldValue("images", uploadedURLs);
+                      }}
+                      multiple={false}
+                    />
+                  </div>
+                  <div>
+                    <TextField name={"username"} label={"Username"} />
+                  </div>
+
+                  <div>
+                    <TextField name={"email"} label={"Email"} />
+                  </div>
+
+                  <div>
+                    <TextField name={"address"} label={"Address"} />
+                  </div>
+
+                  <div>
+                    <TextField name={"phoneNumber"} label={"Phone Number"} />
+                  </div>
+
+                  <div className="flex space-x-4">
+                    <ActionButton type="submit" name="Save" />
+                    <ActionButton
+                      type="button"
+                      name="Cancel"
+                      onClick={() => setIsEditing(false)}
+                    />
+                  </div>
+                </Form>
+              )}
+            </Formik>
+          ) : (
+            <div>
+              <div className="text-lg font-medium">{currentUser?.username}</div>
+              <div className="text-sm text-gray-600">{currentUser?.email}</div>
+              <div className="text-sm text-gray-600">
+                {currentUser?.address || "N/A"}
+              </div>
+              <div className="text-sm text-gray-600">
+                {currentUser?.phoneNumber || "N/A"}
+              </div>
+            </div>
+          )}
         </div>
       </Card>
 

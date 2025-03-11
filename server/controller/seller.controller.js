@@ -55,11 +55,12 @@ export const viewSingleSeller = async (req, res) => {
 export const editSeller = async (req, res) => {
   try {
     const { id } = req.params;
-    const { username, email, password, category, role } = req.body;
+    const { username, email, imageUrl, address, phoneNumber } = req.body;
+    console.log(username, email, imageUrl, address, phoneNumber)
 
     const updatedSeller = await Seller.findByIdAndUpdate(
       id,
-      { username, email, password, category, role },
+      { username, email, address, phoneNumber, imageUrl },
       { new: true, runValidators: true }
     );
 
@@ -109,7 +110,7 @@ export const deleteSeller = async (req, res) => {
 
 export const viewSupplier = async (req, res) => {
   try {
-    const suppliers = await Seller.find({category:"supplier"})
+    const suppliers = await Seller.find({ category: "supplier" })
       .populate("role", "name")
       .select("-password -resetPasswordToken -fcmToken")
       .exec();

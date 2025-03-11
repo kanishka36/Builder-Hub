@@ -35,6 +35,15 @@ const sellerSchema = new mongoose.Schema(
       ref: "Role",
       required: true,
     },
+    imageUrl: {
+      type: String,
+    },
+    address: {
+      type: String,
+    },
+    phoneNumber: {
+      type: Number,
+    },
     resetPasswordToken: {
       type: String,
       default: null,
