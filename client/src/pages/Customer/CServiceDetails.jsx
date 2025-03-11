@@ -147,6 +147,13 @@ const CServiceDetails = () => {
     return selectedDates.includes(formattedDate);
   };
 
+  const isPastDate = (date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set time to start of day for accurate comparison
+    return date < today; // Returns true if the date is in the past
+  };
+  
+
   useEffect(() => {
     fetchService();
     fetchBookedDates();
@@ -208,17 +215,19 @@ const CServiceDetails = () => {
               Schedule a Consultation
             </div>
             <div className="mb-4">
-                <Calendar
-                  onClickDay={handleSelectDate} // Click to select multiple dates
-                  tileClassName={({ date }) =>
-                    isDateBooked(date)
-                      ? "bg-red-500 text-white cursor-not-allowed" // Booked dates
-                      : isDateSelected(date)
-                      ? "bg-blue-400 text-white" // Selected dates
-                      : "bg-green-200" // Available dates
-                  }
-                  tileDisabled={({ date }) => isDateBooked(date)} // Disable booked dates
-                />
+              <Calendar
+                onClickDay={handleSelectDate} // Click to select multiple dates
+                tileClassName={({ date }) =>
+                  isPastDate(date) // Check if past date
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed" // Gray out past dates
+                    : isDateBooked(date)
+                    ? "bg-red-500 text-white cursor-not-allowed" // Booked dates
+                    : isDateSelected(date)
+                    ? "bg-blue-400 text-white" // Selected dates
+                    : "bg-green-200" // Available dates
+                }
+                tileDisabled={({ date }) => isPastDate(date) || isDateBooked(date)} // Disable past and booked dates
+              />
             </div>
             <div className="mb-4">
               <button
