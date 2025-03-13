@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Card from "../../components/Card";
-import ReviewBox from "../../components/ReviewBox";
+import Card from "../../components/UI/Card";
+import ReviewBox from "../../components/UI/ReviewBox";
 import Calendar from "react-calendar";
 import axios from "axios";
 import { useParams } from "react-router-dom";
@@ -30,6 +30,7 @@ const CServiceDetails = () => {
   const customerId = currentUser?._id;
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
 
+  console.log(service);
 
   useEffect(() => {
     const fetchService = async () => {
@@ -63,7 +64,6 @@ const CServiceDetails = () => {
     fetchBookedDates();
   }, [serviceId, apiUrl]);
 
-
   // Handle multiple date selection
   const handleSelectDate = (date) => {
     const formattedDate = date.toISOString().split("T")[0];
@@ -78,10 +78,11 @@ const CServiceDetails = () => {
     }
 
     // Toggle selection (add/remove date)
-    setSelectedDates((prevSelected) =>
-      prevSelected.includes(formattedDate)
-        ? prevSelected.filter((d) => d !== formattedDate) // Remove if already selected
-        : [...prevSelected, formattedDate] // Add new date
+    setSelectedDates(
+      (prevSelected) =>
+        prevSelected.includes(formattedDate)
+          ? prevSelected.filter((d) => d !== formattedDate) // Remove if already selected
+          : [...prevSelected, formattedDate] // Add new date
     );
   };
 
@@ -197,7 +198,7 @@ const CServiceDetails = () => {
     return bookedDates.includes(formattedDate);
   };
 
-   // Check if date is selected
+  // Check if date is selected
   const isDateSelected = (date) => {
     const formattedDate = date.toISOString().split("T")[0];
     return selectedDates.includes(formattedDate);
@@ -209,22 +210,19 @@ const CServiceDetails = () => {
     return date < today; // Returns true if the date is in the past
   };
 
-
   return (
     <div className="container mx-auto p-6 flex gap-8">
       <div className="flex-3">
         <div className="text-2xl font-bold">{service.title}</div>
         <Card className="flex items-center mt-3">
           <img
-            src={""}
+            src={service.seller?.imageUrl}
             alt={service.seller?.username}
             className="w-10 h-10 rounded-full mr-3"
           />
           <div>
             <div className="font-semibold">{service.seller?.username}</div>
-            <div className="text-sm text-gray-500">
-              4 orders in queue
-            </div>
+            <div className="text-sm text-gray-500">4 orders in queue</div>
           </div>
         </Card>
         <Card className="mt-6">
@@ -268,16 +266,19 @@ const CServiceDetails = () => {
             <div className="mb-4">
               <Calendar
                 onClickDay={handleSelectDate} // Click to select multiple dates
-                tileClassName={({ date }) =>
-                  isPastDate(date) // Check if past date
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed" // Gray out past dates
-                    : isDateBooked(date)
-                    ? "bg-red-500 text-white cursor-not-allowed" // Booked dates
-                    : isDateSelected(date)
-                    ? "bg-blue-400 text-white" // Selected dates
-                    : "bg-green-200" // Available dates
+                tileClassName={
+                  ({ date }) =>
+                    isPastDate(date) // Check if past date
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed" // Gray out past dates
+                      : isDateBooked(date)
+                      ? "bg-red-500 text-white cursor-not-allowed" // Booked dates
+                      : isDateSelected(date)
+                      ? "bg-blue-400 text-white" // Selected dates
+                      : "bg-green-200" // Available dates
                 }
-                tileDisabled={({ date }) => isPastDate(date) || isDateBooked(date)} // Disable past and booked dates
+                tileDisabled={({ date }) =>
+                  isPastDate(date) || isDateBooked(date)
+                } // Disable past and booked dates
               />
             </div>
             <div className="mb-4">
