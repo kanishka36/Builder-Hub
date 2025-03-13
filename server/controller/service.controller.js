@@ -47,7 +47,7 @@ export const addService = async (req, res) => {
 // View All Services
 export const viewService = async (req, res) => {
   try {
-    const services = await Service.find().populate("seller", "username").exec();
+    const services = await Service.find().populate("seller", "username imageUrl").exec();
 
     if (!services || services.length === 0) {
       return res.status(404).json({
@@ -73,7 +73,7 @@ export const viewSingleService = async (req, res) => {
   try {
     const { id } = req.params;
     const service = await Service.findById(id)
-      .populate("seller", "username")
+      .populate("seller", "username imageUrl")
       .exec();
 
     if (!service) {

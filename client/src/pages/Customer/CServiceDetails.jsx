@@ -30,11 +30,11 @@ const CServiceDetails = () => {
   const customerId = currentUser?._id;
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
 
-
   useEffect(() => {
     const fetchService = async () => {
       try {
         const res = await axios.get(`${apiUrl}/api/view-service/${serviceId}`);
+        console.log(res.data.data, "service");
         console.log(res.data.data, "service");
         setService(res.data.data);
         setSellerId(res.data.data?.seller?._id); // Set sellerId after service loads
@@ -63,7 +63,6 @@ const CServiceDetails = () => {
     fetchBookedDates();
   }, [serviceId, apiUrl]);
 
-
   // Handle multiple date selection
   const handleSelectDate = (date) => {
     const formattedDate = date.toISOString().split("T")[0];
@@ -78,10 +77,11 @@ const CServiceDetails = () => {
     }
 
     // Toggle selection (add/remove date)
-    setSelectedDates((prevSelected) =>
-      prevSelected.includes(formattedDate)
-        ? prevSelected.filter((d) => d !== formattedDate) // Remove if already selected
-        : [...prevSelected, formattedDate] // Add new date
+    setSelectedDates(
+      (prevSelected) =>
+        prevSelected.includes(formattedDate)
+          ? prevSelected.filter((d) => d !== formattedDate) // Remove if already selected
+          : [...prevSelected, formattedDate] // Add new date
     );
   };
 
@@ -197,7 +197,7 @@ const CServiceDetails = () => {
     return bookedDates.includes(formattedDate);
   };
 
-   // Check if date is selected
+  // Check if date is selected
   const isDateSelected = (date) => {
     const formattedDate = date.toISOString().split("T")[0];
     return selectedDates.includes(formattedDate);
@@ -209,22 +209,27 @@ const CServiceDetails = () => {
     return date < today; // Returns true if the date is in the past
   };
 
-
   return (
     <div className="container mx-auto p-6 flex gap-8">
       <div className="flex-3">
         <div className="text-2xl font-bold">{service.title}</div>
         <Card className="flex items-center mt-3">
-          <img
-            src={""}
-            alt={service.seller?.username}
-            className="w-10 h-10 rounded-full mr-3"
-          />
+          <div className="w-20 h-20 bg-gray-300 rounded-full overflow-hidden mr-3">
+            {service.seller?.imageUrl ? (
+              <img
+                src={service.seller?.imageUrl}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-sm text-gray-500 flex items-center justify-center h-full">
+                No Image
+              </span>
+            )}
+          </div>
           <div>
             <div className="font-semibold">{service.seller?.username}</div>
-            <div className="text-sm text-gray-500">
-              4 orders in queue
-            </div>
+            <div className="text-sm text-gray-500">4 orders in queue</div>
           </div>
         </Card>
         <Card className="mt-6">
@@ -268,16 +273,19 @@ const CServiceDetails = () => {
             <div className="mb-4">
               <Calendar
                 onClickDay={handleSelectDate} // Click to select multiple dates
-                tileClassName={({ date }) =>
-                  isPastDate(date) // Check if past date
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed" // Gray out past dates
-                    : isDateBooked(date)
-                    ? "bg-red-500 text-white cursor-not-allowed" // Booked dates
-                    : isDateSelected(date)
-                    ? "bg-blue-400 text-white" // Selected dates
-                    : "bg-green-200" // Available dates
+                tileClassName={
+                  ({ date }) =>
+                    isPastDate(date) // Check if past date
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed" // Gray out past dates
+                      : isDateBooked(date)
+                      ? "bg-red-500 text-white cursor-not-allowed" // Booked dates
+                      : isDateSelected(date)
+                      ? "bg-blue-400 text-white" // Selected dates
+                      : "bg-green-200" // Available dates
                 }
-                tileDisabled={({ date }) => isPastDate(date) || isDateBooked(date)} // Disable past and booked dates
+                tileDisabled={({ date }) =>
+                  isPastDate(date) || isDateBooked(date)
+                } // Disable past and booked dates
               />
             </div>
             <div className="mb-4">
