@@ -41,6 +41,22 @@ app.use(
   })
 );
 
+app.post("/api/generate-hash", (req, res) => {
+  const { merchant_id, order_id, amount, currency } = req.body;
+  const merchant_secret =
+    "MjU2MjQ3ODU0Mzg1NDExMjgxMDMwODM3NjkwNTQ4OTM5NzEwMzI=";
+
+  const hash = md5(
+    merchant_id +
+      order_id +
+      Number(amount).toFixed(2) +
+      currency +
+      md5(merchant_secret).toUpperCase()
+  ).toUpperCase();
+
+  res.json({ hash });
+});
+
 //routes
 app.use("/api", authUserRoutes);
 app.use("/api", authSellerRoutes);
