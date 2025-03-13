@@ -11,6 +11,7 @@ import { authAdminRoutes } from "./routes/auth/admin.auth.routes.js";
 import { roleRoutes } from "./routes/role.routes.js";
 import { sellerRoutes } from "./routes/seller.routes.js";
 import { bookingRoutes } from "./routes/booking.routes.js";
+import md5 from "md5";
 
 dotenv.config();
 
