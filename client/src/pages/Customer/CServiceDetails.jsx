@@ -236,25 +236,16 @@ const CServiceDetails = () => {
           </div>
         </Card>
         <Card className="mt-6">
-          <div className="font-semibold">Description</div>
-          <div className="text-gray-700 text-sm mt-2">
+          <div className="font-semibold mt-2">Description</div>
+          <div className="text-gray-700 text-sm mt-1">
             {service?.description}
           </div>
-        </Card>
-        <Card className="mt-6">
-          <div className="flex justify-between items-center font-bold mb-3">
-            <div className="text-lg ">
-              What people loved about this freelancer
-            </div>
-            <div className="text-md">See all reviews</div>
+          <div className="font-semibold mt-2">Price</div>
+          <div className="text-gray-700 text-sm mt-1">
+            {service?.price
+              ? `LKR ${service.price} per day`
+              : "Price not available"}
           </div>
-          <ReviewBox
-            username={review.username}
-            rating={review.rating}
-            timeAgo={review.timeAgo}
-            comment={review.comment}
-            sellerResponse={review.comment}
-          />
         </Card>
         <Card className="mt-6">
           <div className="text-lg font-bold mb-4">Reviews</div>
