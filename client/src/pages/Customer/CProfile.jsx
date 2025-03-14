@@ -34,7 +34,7 @@ const CProfile = () => {
     lastName: Yup.string().required("Last Name is required"),
     email: Yup.string().email("Invalid email").required("Email is required"),
     address: Yup.string().required("Address is required"),
-    cite: Yup.string().required("City is required"),
+    city: Yup.string().required("City is required"),
     phoneNumber: Yup.string()
       .matches(/^\d{10}$/, "Phone number must be 10 digits")
       .notRequired(),
@@ -52,7 +52,7 @@ const CProfile = () => {
           firstName: values.firstName,
           lastName: values.lastName,
           email: values.email,
-          imageUrl: values.imageUrl,
+          imageUrl: values.images,
           address: values.address,
           phoneNumber: values.phoneNumber,
           city: values.city,
@@ -120,97 +120,104 @@ const CProfile = () => {
               {/* Two Cards Row */}
               <div className="flex mb-6 gap-6">
                 {/* Personal Profile Card */}
-                <Card className="flex-1 p-6">
-                  <div className="flex gap-3">
-                    <div className="text-xl font-semibold">
-                      Personal Profile
-                    </div>
-                    <div className="">
-                      <ActionButton
-                        className="ml-auto"
-                        name={isEditing ? "Cancel" : "Edit"}
-                        onClick={() => setIsEditing(!isEditing)}
-                      />
-                    </div>
-                  </div>
-                  {!isEditing && (
-                    <div className="w-20 h-20 bg-gray-300 rounded-full overflow-hidden">
-                      {currentUser?.imageUrl ? (
-                        <img
-                          src={currentUser.imageUrl}
-                          alt="Profile"
-                          className="w-full h-full object-cover"
+                <div className="flex-1">
+                  <Card className={`${isEditing ? "absolute" : ""}`}>
+                    <div className="flex gap-3">
+                      <div className="text-xl font-semibold">
+                        Personal Profile
+                      </div>
+                      <div className="">
+                        <ActionButton
+                          className="ml-auto"
+                          name={isEditing ? "Cancel" : "Edit"}
+                          onClick={() => setIsEditing(!isEditing)}
                         />
-                      ) : (
-                        <span className="text-sm text-gray-500 flex items-center justify-center h-full">
-                          No Image
-                        </span>
-                      )}
+                      </div>
                     </div>
-                  )}
-                  <div className="flex">
-                    {isEditing ? (
-                      <Formik
-                        initialValues={initialValues}
-                        validationSchema={validationSchema}
-                        onSubmit={handleSubmit}
-                      >
-                        {({ setFieldValue, isSubmitting }) => (
-                          <Form className="space-y-2">
-                            <div>
-                              <FileUpload
-                                name="images"
-                                label={"Uploade Profile Picture"}
-                                onUploadComplete={(uploadedURLs) => {
-                                  console.log("Uploaded URLs:", uploadedURLs); // Debugging
-                                  setFieldValue("images", uploadedURLs);
-                                }}
-                                multiple={false}
-                              />
-                            </div>
-
-                            <TextField name={"username"} label={"Username"} />
-                            <TextField
-                              name={"firstName"}
-                              label={"First Name"}
-                            />
-                            <TextField name={"lastName"} label={"Last Name"} />
-                            <TextField name={"email"} label={"Email"} />
-                            <TextField name={"address"} label={"Address"} />
-                            <TextField name={"city"} label={"City"} />
-                            <TextField
-                              name={"phoneNumber"}
-                              label={"Phone Number"}
-                            />
-
-                            <div className="flex space-x-4">
-                              <SubmitButton name={"Save"} />
-                              <ActionButton
-                                name="Cancel"
-                                onClick={() => setIsEditing(false)}
-                              />
-                            </div>
-                          </Form>
+                    {!isEditing && (
+                      <div className="w-20 h-20 bg-gray-300 rounded-full overflow-hidden">
+                        {currentUser?.imageUrl ? (
+                          <img
+                            src={currentUser.imageUrl}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-sm text-gray-500 flex items-center justify-center h-full">
+                            No Image
+                          </span>
                         )}
-                      </Formik>
-                    ) : (
-                      <div>
-                        <div className="text-lg font-medium">
-                          {currentUser?.username}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          {currentUser?.email}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          {currentUser?.address || "N/A"}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          {currentUser?.phoneNumber || "N/A"}
-                        </div>
                       </div>
                     )}
-                  </div>
-                </Card>
+                    <div className="flex">
+                      {isEditing ? (
+                        <Formik
+                          initialValues={initialValues}
+                          validationSchema={validationSchema}
+                          onSubmit={handleSubmit}
+                        >
+                          {({ setFieldValue, isSubmitting }) => (
+                            <Form className="space-y-2">
+                              <div>
+                                <FileUpload
+                                  name="images"
+                                  label={"Uploade Profile Picture"}
+                                  onUploadComplete={(uploadedURLs) => {
+                                    console.log("Uploaded URLs:", uploadedURLs); // Debugging
+                                    setFieldValue("images", uploadedURLs);
+                                  }}
+                                  multiple={false}
+                                />
+                              </div>
+
+                              <TextField name={"username"} label={"Username"} />
+                              <div className="flex gap-2">
+                                <TextField
+                                  name={"firstName"}
+                                  label={"First Name"}
+                                />
+                                <TextField
+                                  name={"lastName"}
+                                  label={"Last Name"}
+                                />
+                              </div>
+                              <TextField name={"email"} label={"Email"} />
+                              <TextField name={"address"} label={"Address"} />
+                              <TextField name={"city"} label={"City"} />
+                              <TextField
+                                name={"phoneNumber"}
+                                label={"Phone Number"}
+                              />
+
+                              <div className="flex space-x-4">
+                                <SubmitButton name={"Save"} />
+                                <ActionButton
+                                  name="Cancel"
+                                  onClick={() => setIsEditing(false)}
+                                />
+                              </div>
+                            </Form>
+                          )}
+                        </Formik>
+                      ) : (
+                        <div>
+                          <div className="text-lg font-medium">
+                            {currentUser?.username}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {currentUser?.email}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {currentUser?.address || "N/A"}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {currentUser?.phoneNumber || "N/A"}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                </div>
 
                 {/* Address Card */}
                 <Card className="flex-1 p-6">

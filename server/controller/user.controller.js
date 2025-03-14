@@ -3,7 +3,7 @@ import { User } from "../model/user.model.js";
 export const editUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const {
+    let {
       username,
       firstName,
       lastName,
@@ -13,7 +13,10 @@ export const editUser = async (req, res) => {
       phoneNumber,
       city,
     } = req.body;
-    console.log(username, email, imageUrl, address, phoneNumber);
+
+    if (Array.isArray(imageUrl) && imageUrl.length > 0) {
+      imageUrl = imageUrl[0]; 
+    }
 
     const updatedUser = await User.findByIdAndUpdate(
       id,
@@ -42,6 +45,7 @@ export const editUser = async (req, res) => {
       data: updatedUser,
     });
   } catch (error) {
+    console.log(error)
     return res.status(500).json({
       success: false,
       message: "An error occurred while updating user",
