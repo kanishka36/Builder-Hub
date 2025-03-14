@@ -8,10 +8,27 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const regUser = async (req, res) => {
-  const { username, email, password, phoneNumber, address } = req.body;
+  const {
+    username,
+    firstName,
+    lastName,
+    email,
+    password,
+    phoneNumber,
+    address,
+    city,
+  } = req.body;
 
   try {
-    if (!username || !password || !email) {
+    if (
+      !username ||
+      !password ||
+      !email ||
+      !firstName ||
+      !lastName ||
+      !address ||
+      !city
+    ) {
       return res.status(400).json({
         succuss: false,
         message: "Please fill in all required fields",
@@ -30,10 +47,13 @@ export const regUser = async (req, res) => {
 
     await User.create({
       username: username,
+      firstName: firstName,
+      lastName: lastName,
       email: email,
       password: hashPassword,
       phoneNumber: phoneNumber,
       address: address,
+      city: city
     });
 
     res.status(201).json({
@@ -184,7 +204,6 @@ export const logoutUser = async (req, res) => {
     });
   }
 };
-
 
 export const checkUserAuth = (req, res, next) => {
   try {

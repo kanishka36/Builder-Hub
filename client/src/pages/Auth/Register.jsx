@@ -71,14 +71,19 @@ const Register = () => {
             <div>
               <TextField type={"text"} name={"username"} label={"Username"} />
             </div>
-            <div>
-              <TextField type={"email"} name={"email"} label={"Email"} />
+            <div className="flex gap-2">
+              <TextField type={"text"} name={"firstName"} label={"First Name"} />
+              <TextField type={"text"} name={"lastName"} label={"Last Name"} /> 
             </div>
-            <div>
+            <div className="flex gap-2">
+              <TextField type={"email"} name={"email"} label={"Email"} />
               <TextField type={"text"} name={"phoneNumber"} label={"Phone Number"} />
             </div>
             <div>
               <TextField type={"text"} name={"address"} label={"Address"} />
+            </div>
+            <div>
+              <TextField type={"text"} name={"city"} label={"City"} />
             </div>
             <div>
               <TextField type={"password"} name={"password"} label={"Password"} />

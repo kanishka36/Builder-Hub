@@ -6,6 +6,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
+import { v4 as uuidv4 } from "uuid";
 
 const CServiceDetails = () => {
   const review = {
@@ -30,12 +31,12 @@ const CServiceDetails = () => {
   const customerId = currentUser?._id;
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
 
+  console.log(service, "service");
+
   useEffect(() => {
     const fetchService = async () => {
       try {
         const res = await axios.get(`${apiUrl}/api/view-service/${serviceId}`);
-        console.log(res.data.data, "service");
-        console.log(res.data.data, "service");
         setService(res.data.data);
         setSellerId(res.data.data?.seller?._id); // Set sellerId after service loads
       } catch (error) {
@@ -95,32 +96,34 @@ const CServiceDetails = () => {
     }
 
     // Generate Order ID
-    const orderId = `BOOKING_${Date.now()}`;
+    const orderId = `BOOKING_${uuidv4()}`;
+    const merchantID = import.meta.env.VITE_PAYHERE_MERCHANT_ID;
+    const totalPrice = service.price * selectedDates.length;
 
     // Define payment details
     const payment = {
-      sandbox: true, // Set to false for live
-      merchant_id: "1226807", // Must be a string, not a number
-      return_url: "http://localhost:5173/payment-success", // Redirect after success
-      cancel_url: "http://localhost:5173/payment-failed", // Redirect if canceled
-      // notify_url: `${apiUrl}/api/payment-webhook`, // Webhook for backend validation
-      notify_url: `http://localhost:5173/notify`, // Webhook for backend validation
-      order_id: "ItemNo123452",
-      items: "Pharmacy Items",
-      amount: 100,
+      sandbox: true,
+      merchant_id: merchantID,
+      return_url: "http://localhost:5173/payment-success",
+      cancel_url: "http://localhost:5173/payment-failed",
+      // notify_url: `${apiUrl}/api/payment-webhook`,
+      notify_url: `http://localhost:5173/notify`,
+      order_id: orderId,
+      items: service.title,
+      amount: totalPrice,
       currency: "LKR",
-      first_name: "user.firstName",
-      last_name: "user.lastName",
-      email: "user.email",
-      phone: "user.phone",
-      address: "No.1, Galle Road",
-      city: "Colombo",
+      first_name: currentUser.firstName,
+      last_name: currentUser.lastName,
+      email: currentUser.email,
+      phone: currentUser.phoneNumber,
+      address: currentUser.address,
+      city: currentUser.city,
       country: "Sri Lanka",
-      delivery_address: "No. 46, Galle road, Kalutara South",
-      delivery_city: "Kalutara",
+      delivery_address: currentUser.address,
+      delivery_city: currentUser.city,
       delivery_country: "Sri Lanka",
-      custom_1: "",
-      custom_2: "",
+      custom_1: sellerId,
+      custom_2: customerId,
     };
 
     try {

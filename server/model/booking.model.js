@@ -21,6 +21,10 @@ const bookingSchema = new mongoose.Schema(
       ref: "Service",
       required: true,
     },
+    transactionId: {
+      type: String,
+      required: true,
+    },
     status: {
       type: String,
       default: "conformed"
