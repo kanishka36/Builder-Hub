@@ -1,6 +1,6 @@
 import React from "react";
-import Navbar from "../Navbar";
-import Footer from "../Footer";
+import Navbar from "../UI/Navbar";
+import Footer from "../UI/Footer";
 import { ToastContainer } from "react-toastify";
 
 const CustomerLayout = ({ component: Component }) => {

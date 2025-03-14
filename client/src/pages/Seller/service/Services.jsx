@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import Table from "../../../components/Table";
+import Table from "../../../components/UI/Table";
 import ActionButton from "../../../components/Button/ActionButton";
 import EditButton from "../../../components/Button/EditButton";
 import DeleteButton from "../../../components/Button/DeleteButton";

@@ -39,7 +39,7 @@ const userSlice = createSlice({
       state.isAuthenticated = false;
       state.currentUser = null;
     },
-    updateSellerSuccess: (state, action) => {
+    updateUserSuccess: (state, action) => {
       state.currentUser = action.payload;
     },
   },
@@ -52,7 +52,7 @@ export const {
   signOutSuccess,
   authenticateSuccess,
   authenticateFailure,
-  updateSellerSuccess,
+  updateUserSuccess,
 } = userSlice.actions;
 
 export default userSlice.reducer;

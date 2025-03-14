@@ -30,7 +30,7 @@ const Navbar = () => {
           {currentUser && currentUser.role === "user" ? (
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gray-500 rounded-full" />
-              <div className="text-gray-300">Hi, {currentUser.username}</div>
+              <Link to={"/user/profile"} className="text-gray-300">Hi, {currentUser.username}</Link>
             </div>
           ) : (
             <Link to={'/sign-in'} className="text-gray-300 hover:text-white">Sign In</Link>

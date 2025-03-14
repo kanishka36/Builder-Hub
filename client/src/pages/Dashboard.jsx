@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import Card from "../components/Card";
+import Card from "../components/UI/Card";
 import ActionButton from "../components/Button/ActionButton";
 import TextField from "../components/Form/TextField";
 import FileUpload from "../components/Form/FileUpload";
+import { toast } from "react-toastify";
 import axios from "axios";
-import { updateSellerSuccess } from "../redux/user/userSlice";
+import { updateUserSuccess } from "../redux/user/userSlice";
 
 const Dashboard = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -50,14 +51,21 @@ const Dashboard = () => {
         { withCredentials: true }
       );
       const data = res.data.data;
-      dispatch(updateSellerSuccess(data));
+      dispatch(updateUserSuccess(data));
       setIsEditing(false);
       console.log(data, "updated seller data");
+      toast.success("Updated seller successfully", {
+        position: "top-center",
+        autoClose: 1500,
+      });
     } catch (error) {
       console.log("Failed to update seller:", error);
+      toast.error("Failed to update seller", {
+        position: "top-center",
+        autoClose: 1500,
+      });
     }
   };
-
 
   return (
     <div className="container mx-auto">
@@ -74,19 +82,21 @@ const Dashboard = () => {
             />
           </div>
         </div>
-        <div className="w-20 h-20 bg-gray-300 rounded-full overflow-hidden">
-          {currentUser?.imageUrl ? (
-            <img
-              src={currentUser.imageUrl}
-              alt="Profile"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <span className="text-sm text-gray-500 flex items-center justify-center h-full">
-              No Image
-            </span>
-          )}
-        </div>
+        {!isEditing && (
+          <div className="w-20 h-20 bg-gray-300 rounded-full overflow-hidden">
+            {currentUser?.imageUrl ? (
+              <img
+                src={currentUser.imageUrl}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-sm text-gray-500 flex items-center justify-center h-full">
+                No Image
+              </span>
+            )}
+          </div>
+        )}
         <div className="flex">
           {isEditing ? (
             <Formik

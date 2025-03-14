@@ -3,7 +3,7 @@ import { Form, Formik } from "formik";
 import { Link } from "react-router-dom";
 import * as Yup from "yup";
 import ActionButton from "../../../components/Button/ActionButton";
-import Card from "../../../components/Card";
+import Card from "../../../components/UI/Card";
 import TextField from "../../../components/Form/TextField";
 import axios from "axios";
 import TextArea from "../../../components/Form/TextArea";
@@ -18,7 +18,6 @@ const AddService = () => {
 
   // Handle Form Submission
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-
     try {
       await axios.post(`${apiUrl}/api/add-service/${sellerId}`, values, {
         withCredentials: true,

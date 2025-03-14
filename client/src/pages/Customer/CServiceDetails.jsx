@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Card from "../../components/Card";
-import ReviewBox from "../../components/ReviewBox";
+import Card from "../../components/UI/Card";
+import ReviewBox from "../../components/UI/ReviewBox";
 import Calendar from "react-calendar";
 import axios from "axios";
 import { useParams } from "react-router-dom";

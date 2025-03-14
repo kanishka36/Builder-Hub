@@ -12,6 +12,7 @@ import { roleRoutes } from "./routes/role.routes.js";
 import { sellerRoutes } from "./routes/seller.routes.js";
 import { bookingRoutes } from "./routes/booking.routes.js";
 import md5 from "md5";
+import { userRoutes } from "./routes/user.routes.js";
 
 dotenv.config();
 
@@ -66,6 +67,7 @@ app.use("/api", serviceRoutes);
 app.use("/api", roleRoutes);
 app.use("/api", sellerRoutes);
 app.use("/api", bookingRoutes);
+app.use("/api", userRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello Kanishka");

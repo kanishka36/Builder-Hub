@@ -1,6 +1,6 @@
 import React from "react";
-import HeroSection from "../../components/HeroSection";
-import Slider from "../../components/Slider";
+import HeroSection from "../../components/UI/HeroSection";
+import Slider from "../../components/UI/Slider";
 
 const Home = () => {
   return (

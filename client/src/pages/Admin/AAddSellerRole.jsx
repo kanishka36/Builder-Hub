@@ -3,7 +3,7 @@ import { Form, Formik } from "formik";
 import { Link, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import ActionButton from "../../components/Button/ActionButton";
-import Card from "../../components/Card";
+import Card from "../../components/UI/Card";
 import TextField from "../../components/Form/TextField";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -11,7 +11,7 @@ import RadioField from "../../components/Form/RadioField";
 import BackButton from "../../components/Button/BackButton";
 
 const AAddSellerRole = () => {
-    const navigate = useNavigate()
+  const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
 
   // Handle Form Submission

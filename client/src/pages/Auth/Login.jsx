@@ -2,7 +2,6 @@ import React from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
-import ActionButton from "../../components/Button/ActionButton";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -12,6 +11,7 @@ import {
 } from "../../redux/user/userSlice";
 import { ToastContainer, toast } from "react-toastify";
 import TextField from "../../components/Form/TextField";
+import SubmitButton from "../../components/Button/SubmitButton";
 
 const Login = () => {
   const validationSchema = Yup.object({
@@ -71,7 +71,7 @@ const Login = () => {
             </div>
 
             <div>
-              <ActionButton name={"Login"} disabled={isSubmitting} />
+              <SubmitButton name={"Login"} disabled={isSubmitting} />
             </div>
           </Form>
         )}

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import Card from "../../components/Card";
+import Card from "../../components/UI/Card";
 import { Star } from "lucide-react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import LoadingPage from "../../components/LoadingPage";
+import LoadingPage from "../../components/UI/LoadingPage";
 
 // const services = [
 //   {

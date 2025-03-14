@@ -1,6 +1,6 @@
 import React from "react";
 
-const ActionButton = ({ onClick, name, type }) => {
+const ActionButton = ({ onClick, name, type = "button" }) => {
   return (
     <button
       type={type}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Table from "../../components/Table";
+import Table from "../../components/UI/Table";
 import EditButton from "../../components/Button/EditButton";
 import DeleteButton from "../../components/Button/DeleteButton";
 import axios from "axios";

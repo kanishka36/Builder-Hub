@@ -23,6 +23,7 @@ import ASellerRole from "./pages/Admin/ASellerRole";
 import CSupplierShop from "./pages/Customer/CSupplierShop";
 import Bookings from "./pages/Seller/service/Bookings";
 import CustomerPrivateRoutes from "./components/routes/CustomerPrivateRoutes";
+import CProfile from "./pages/Customer/CProfile";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         {/* customer  */}
         <Route element={<CustomerPrivateRoutes />}>
           <Route path="/services/:serviceId" element={<CustomerLayout component={CServiceDetails} />} /> 
+          <Route path="/user/profile" element={<CustomerLayout component={CProfile} />} /> 
         </Route>
         <Route path="/" element={<CustomerLayout component={Home} />} />
         <Route path="/services" element={<CustomerLayout component={CServices} />} />
