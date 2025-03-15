@@ -93,19 +93,6 @@ const Bookings = () => {
                     <span className="font-medium">
                       {booking.customer?.username || "Unknown User"}
                     </span>
-                    <span
-                      className={`text-sm px-2 py-1 rounded ${
-                        booking.status === "Confirmed"
-                          ? "bg-blue-200 text-blue-700"
-                          : booking.status === "In Progress"
-                          ? "bg-yellow-200 text-yellow-700"
-                          : booking.status === "Canceled"
-                          ? "bg-red-200 text-red-700"
-                          : "bg-green-200 text-green-700"
-                      }`}
-                    >
-                      {booking.status}
-                    </span>
                   </div>
                   <p className="text-sm text-gray-600">
                     {booking.service.title || "Unknown Service"}
@@ -134,10 +121,15 @@ const Bookings = () => {
               <div className="flex gap-3 items-center mb-4">
                 <h2 className="text-xl font-semibold">Booking Details</h2>
                 <div
-                  className={`px-2 py-1 rounded border ${
+                  className={`px-2 py-1 rounded border 
+                  ${
                     selectedBooking?.jobStatus === "Pending"
                       ? "border-blue-500 bg-blue-200"
-                      : "border-green-500 bg-green-200"
+                      : selectedBooking?.jobStatus === "Completed"
+                      ? "border-green-500 bg-green-200"
+                      : selectedBooking?.jobStatus === "Cancelled"
+                      ? "border-red-500 bg-red-200"
+                      : "border-gray-400 bg-gray-200"
                   }`}
                 >
                   {selectedBooking?.jobStatus}
@@ -191,11 +183,19 @@ const Bookings = () => {
                 </p>
               </div>
 
-              <div className="flex space-x-3 mt-4">
+              <div
+                className={`${
+                  selectedBooking?.jobStatus === "Completed" || "Cancelled"
+                    ? "hidden"
+                    : "flex space-x-3 mt-4"
+                }`}
+              >
                 <ActionButton
                   onClick={() => handleBooking(selectedBooking._id)}
                   name={"Completed Booking"}
-                  disabled={selectedBooking?.jobStatus === "Completed"}
+                  disabled={
+                    selectedBooking?.jobStatus === "Completed" || "Cancelled"
+                  }
                 />
               </div>
             </>
