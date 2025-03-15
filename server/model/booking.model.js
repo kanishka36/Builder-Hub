@@ -27,17 +27,20 @@ const bookingSchema = new mongoose.Schema(
     },
     paymentStatus: {
       type: String,
-      default: "Conformed"
+      default: "Conformed",
     },
     jobStatus: {
       type: String,
       required: true,
-      default: "Pending"
-    }
+      default: "Pending",
+    },
+    userStatus: {
+      type: String,
+      required: true,
+      default: "Pending",
+    },
   },
   { timestamps: true }
 );
-
-
 
 export const Booking = mongoose.model("Booking", bookingSchema);

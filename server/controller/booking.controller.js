@@ -176,6 +176,39 @@ export const updateJobStatus = async (req, res) => {
   }
 };
 
+export const updateUserStatus = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    const { userStatus } = req.body;
+
+    console.log(bookingId, userStatus)
+
+    if (!userStatus) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Booking not found" });
+    }
+
+    const updateBooking = await Booking.findByIdAndUpdate(
+      bookingId,
+      { userStatus },
+      { new: true, runValidators: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Job Status Updated Successfully",
+      data: updateBooking,
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while updating job status",
+      error: error.message,
+    });
+  }
+};
+
 export const checkAvailability = async (req, res) => {
   try {
     const { selectedDates, serviceId } = req.body;
