@@ -1,5 +1,5 @@
 import React from "react";
-import Sidebar from "../Sidebar";
+import Sidebar from "../UI/Sidebar";
 import { Bell } from "lucide-react";
 import { ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";

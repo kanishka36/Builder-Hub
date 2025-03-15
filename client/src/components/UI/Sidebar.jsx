@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { authenticateFailure, signOutSuccess } from "../redux/user/userSlice";
+import { authenticateFailure, signOutSuccess } from "../../redux/user/userSlice";
 import axios from "axios";
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {

@@ -25,9 +25,14 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    status: {
+    paymentStatus: {
       type: String,
-      default: "conformed"
+      default: "Conformed"
+    },
+    jobStatus: {
+      type: String,
+      required: true,
+      default: "Pending"
     }
   },
   { timestamps: true }

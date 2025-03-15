@@ -23,7 +23,7 @@ import ASellerRole from "./pages/Admin/ASellerRole";
 import CSupplierShop from "./pages/Customer/CSupplierShop";
 import Bookings from "./pages/Seller/service/Bookings";
 import CustomerPrivateRoutes from "./components/routes/CustomerPrivateRoutes";
-import CProfile from "./pages/Customer/CProfile";
+import CProfile from "./pages/Customer/Profile/CProfile";
 
 function App() {
   return (

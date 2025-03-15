@@ -59,8 +59,6 @@ export const viewSellerBookings = async (req, res) => {
       .populate("service", "title description price")
       .exec();
 
-    console.log(bookings, "bookings");
-
     if (!bookings || bookings.length === 0) {
       return res.status(404).json({
         success: false,
@@ -77,6 +75,45 @@ export const viewSellerBookings = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "An error occurred while fetching seller bookings",
+      error: error.message,
+    });
+  }
+};
+
+export const viewUserBookings = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required",
+      });
+    }
+
+    const bookings = await Booking.find({
+      customer: userId,
+    })
+      .populate("seller", "username email phoneNumber")
+      .populate("service", "title description price")
+      .exec();
+
+    if (!bookings || bookings.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No bookings found for this user",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User bookings retrieved successfully",
+      data: bookings,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching user bookings",
       error: error.message,
     });
   }
@@ -106,43 +143,81 @@ export const viewAllBookings = async (req, res) => {
   }
 };
 
+export const updateJobStatus = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    const { jobStatus } = req.body;
+
+    console.log(bookingId, jobStatus)
+
+    if (!jobStatus) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Booking not found" });
+    }
+
+    const updateBooking = await Booking.findByIdAndUpdate(
+      bookingId,
+      { jobStatus },
+      { new: true, runValidators: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Job Status Updated Successfully",
+      data: updateBooking,
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while updating job status",
+      error: error.message,
+    });
+  }
+};
+
 export const checkAvailability = async (req, res) => {
   try {
-      const { selectedDates, serviceId } = req.body;
+    const { selectedDates, serviceId } = req.body;
 
-      if (!selectedDates || !Array.isArray(selectedDates) || selectedDates.length === 0 || !serviceId) {
-          return res.status(400).json({
-              success: false,
-              message: "Invalid request. Please provide selected dates and service ID.",
-          });
-      }
-
-      // Check if any of the selected dates are already booked
-      const existingBookings = await Booking.find({
-          date: { $in: selectedDates },
-          service: serviceId,
+    if (
+      !selectedDates ||
+      !Array.isArray(selectedDates) ||
+      selectedDates.length === 0 ||
+      !serviceId
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid request. Please provide selected dates and service ID.",
       });
+    }
 
-      if (existingBookings.length > 0) {
-          return res.status(200).json({
-              success: true,
-              available: false,
-              message: "Some selected dates are already booked.",
-          });
-      }
+    // Check if any of the selected dates are already booked
+    const existingBookings = await Booking.find({
+      date: { $in: selectedDates },
+      service: serviceId,
+    });
 
+    if (existingBookings.length > 0) {
       return res.status(200).json({
-          success: true,
-          available: true,
-          message: "All selected dates are available for booking.",
+        success: true,
+        available: false,
+        message: "Some selected dates are already booked.",
       });
+    }
 
+    return res.status(200).json({
+      success: true,
+      available: true,
+      message: "All selected dates are available for booking.",
+    });
   } catch (error) {
-      console.error("Error checking availability:", error);
-      return res.status(500).json({
-          success: false,
-          message: "An error occurred while checking availability.",
-          error: error.message,
-      });
+    console.error("Error checking availability:", error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while checking availability.",
+      error: error.message,
+    });
   }
 };
