@@ -13,10 +13,78 @@ import { sellerRoutes } from "./routes/seller.routes.js";
 import { bookingRoutes } from "./routes/booking.routes.js";
 import md5 from "md5";
 import { userRoutes } from "./routes/user.routes.js";
+import { Server } from "socket.io";
+import { createServer } from "http";
+import Chat from "./model/chat.model.js";
 
 dotenv.config();
 
 const app = express();
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: ["http://localhost:5173"], // Allow frontend connection
+    credentials: true,
+  },
+});
+
+// Store connected users (key: userId, value: socketId)
+const users = {};
+
+io.on("connection", (socket) => {
+  console.log("✅ A user connected:", socket.id);
+
+  // When a user joins, store their userId and socketId
+  socket.on("join", async ({ userId, receiverId }) => {
+    users[userId] = socket.id;
+    console.log(`User ${userId} connected with socket ID ${socket.id}`);
+    console.log(`Receiver ${receiverId} connected with socket ID ${socket.id}`);
+
+    try {
+      const chatHistory = await Chat.find({
+        $or: [
+          { senderId: userId, receiverId: receiverId },
+          { senderId: receiverId, receiverId: userId },
+        ],
+      }).sort({ createdAt: 1 });
+      socket.emit("chatHistory", chatHistory);
+    } catch (error) {
+      console.error("Error fetching chat history:", error);
+    }
+  });
+
+  // Handle sending messages
+  socket.on("sendMessage", async (messageData) => {
+    const { senderId, receiverId, message } = messageData;
+
+    // Save message to database
+    const newMessage = new Chat({ senderId, receiverId, message });
+    await newMessage.save();
+
+    // Find recipient's socket ID
+    const receiverSocketId = users[receiverId];
+
+    if (receiverSocketId) {
+      // Send message only to the intended recipient
+      io.to(receiverSocketId).emit("receiveMessage", messageData);
+    } else {
+      console.log(`User ${receiverId} is not online.`);
+    }
+  });
+
+
+  // Handle disconnection
+  socket.on("disconnect", () => {
+    console.log("❌ A user disconnected:", socket.id);
+
+    // Remove disconnected user from users object
+    Object.keys(users).forEach((userId) => {
+      if (users[userId] === socket.id) {
+        delete users[userId];
+      }
+    });
+  });
+});
 
 //Middleware
 app.use(express.json());
@@ -73,9 +141,10 @@ app.get("/", (req, res) => {
   res.send("Hello Kanishka");
 });
 
+// Start Server
 const PORT = process.env.HOST_PORT || 5000;
 
-app.listen(PORT, async () => {
+server.listen(PORT, async () => {
   await connectDB();
   console.log(`✅ Server is running on port ${PORT}`);
 });

@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import Card from "../../../components/UI/Card";
 import ActionButton from "../../../components/Button/ActionButton";
 import { toast } from "react-toastify";
+import Chat from "../../../components/Chat";
 
 const Bookings = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -204,6 +205,9 @@ const Bookings = () => {
           )}
         </Card>
       </div>
+      {selectedBooking && (
+        <Chat userId={sellerId} receiverId={selectedBooking.customer?._id} />
+      )}
     </div>
   );
 };

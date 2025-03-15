@@ -3,7 +3,7 @@ import { Formik, Form } from "formik";
 import TextField from "../../components/Form/TextField"
 import * as Yup from "yup";
 import axios from "axios";
-import ActionButton from "../../components/Button/ActionButton"
+import SubmitButton from "../../components/Button/SubmitButton"
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -92,7 +92,7 @@ const Register = () => {
               <TextField type={"password"} name={"confirmPassword"} label={"Confirm Password"} />
             </div>
             <div>
-              <ActionButton name={"Register"} disabled={isSubmitting} />
+              <SubmitButton name={"Register"} disabled={isSubmitting} />
             </div>
           </Form>
         )}

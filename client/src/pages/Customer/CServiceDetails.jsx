@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
+import Chat from "../../components/Chat";
 
 const CServiceDetails = () => {
   const review = {
@@ -298,6 +299,8 @@ const CServiceDetails = () => {
           </Card>
         </div>
       </div>
+
+      <Chat userId={customerId} receiverId={sellerId} />
     </div>
   );
 };

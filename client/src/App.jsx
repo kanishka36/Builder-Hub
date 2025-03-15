@@ -24,6 +24,7 @@ import CSupplierShop from "./pages/Customer/CSupplierShop";
 import Bookings from "./pages/Seller/service/Bookings";
 import CustomerPrivateRoutes from "./components/routes/CustomerPrivateRoutes";
 import CProfile from "./pages/Customer/Profile/CProfile";
+import Inquiries from "./pages/Seller/Inquiries";
 
 function App() {
   return (
@@ -54,6 +55,7 @@ function App() {
         <Route path="/dashboard/seller-role" element={<AdminLayout component={ASellerRole} />} />
         <Route path="/dashboard/add-seller-role" element={<AdminLayout component={AAddSellerRole} />} />
         <Route path="/dashboard/orders" element={<AdminLayout component={Orders} />} />
+        <Route path="/dashboard/inquiries" element={<AdminLayout component={Inquiries} />} />
       </Routes>
     </BrowserRouter>
   );
