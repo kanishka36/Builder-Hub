@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import Chat from "../../components/Chat";
+import { X } from "lucide-react";
 
 const CServiceDetails = () => {
   const review = {
@@ -28,6 +29,7 @@ const CServiceDetails = () => {
   const [bookedDates, setBookedDates] = useState([]);
   const [selectedDates, setSelectedDates] = useState([]); // Store selected date range
   const [sellerId, setSellerId] = useState(null);
+  const [showChat, setShowChat] = useState(false);
   const { currentUser } = useSelector((state) => state.user);
   const customerId = currentUser?._id;
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
@@ -213,6 +215,10 @@ const CServiceDetails = () => {
     return date < today; // Returns true if the date is in the past
   };
 
+  const handleToggleChat = () => {
+    setShowChat((prev) => !prev);
+  };
+
   return (
     <div className="container mx-auto p-6 flex gap-8">
       <div className="flex-3">
@@ -283,7 +289,7 @@ const CServiceDetails = () => {
                 } // Disable past and booked dates
               />
             </div>
-            <div className="mb-4">
+            <div className="mb-1">
               <button
                 className="w-full mt-2 bg-primary text-black py-2 rounded-lg hover:bg-green-600"
                 onClick={handleBookDate}
@@ -292,15 +298,28 @@ const CServiceDetails = () => {
               </button>
             </div>
             <div>
-              <button className="w-full mt-2 bg-gray-900 text-white py-2 rounded-lg hover:bg-gray-600">
+              <button
+                onClick={handleToggleChat}
+                className="w-full mt-2 bg-gray-900 text-white py-2 rounded-lg hover:bg-gray-600"
+              >
                 Contact Me
               </button>
             </div>
           </Card>
         </div>
       </div>
-
-      <Chat userId={customerId} receiverId={sellerId} />
+      {/* Chat Box (Visible When Contact Me Clicked) */}
+      {showChat && (
+        <div className="fixed bottom-5 right-5 w-[350px] bg-white shadow-lg rounded-lg">
+          {/* Chat Component */}
+          <Chat
+            userId={customerId}
+            receiverId={sellerId}
+            onClose={handleToggleChat}
+            receiverName={service.seller?.username}
+          />
+        </div>
+      )}
     </div>
   );
 };

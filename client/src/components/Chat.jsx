@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 import { Send, MessageSquare, User } from "lucide-react";
+import { X } from "lucide-react";
 
 const socket = io("http://localhost:5000");
 
-const Chat = ({ userId, receiverId }) => {
+const Chat = ({ userId, receiverId, onClose, receiverName }) => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
@@ -17,8 +18,8 @@ const Chat = ({ userId, receiverId }) => {
 
     // Listen for chat history
     socket.on("chatHistory", (chatHistory) => {
-      setMessages(chatHistory)
-    })
+      setMessages(chatHistory);
+    });
 
     // Listen for messages
     socket.on("receiveMessage", (data) => {
@@ -58,12 +59,15 @@ const Chat = ({ userId, receiverId }) => {
   return (
     <div className="flex flex-col h-[600px] w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden">
       {/* Header */}
-      <div className="flex items-center p-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white">
+      <div className="flex items-center p-4 bg-gradient-to-r from-primary to-yellow-500 text-black">
         <MessageSquare className="mr-2 h-6 w-6" />
         <div className="flex-1">
           <h2 className="font-semibold">Direct Chat</h2>
-          <p className="text-sm opacity-90">Chat with your seller</p>
+          <p className="text-sm opacity-90">Chat with {receiverName}</p>
         </div>
+        <button onClick={onClose} className="hover:text-gray-600">
+          <X className="w-6 h-6" />
+        </button>
       </div>
 
       {/* Messages Container */}
@@ -78,7 +82,7 @@ const Chat = ({ userId, receiverId }) => {
             <div
               className={`max-w-[80%] p-3 rounded-lg ${
                 msg.senderId === userId
-                  ? "bg-blue-600 text-white"
+                  ? "bg-primary text-black"
                   : "bg-white border border-gray-200"
               }`}
             >
@@ -110,7 +114,7 @@ const Chat = ({ userId, receiverId }) => {
           <button
             onClick={sendMessage}
             disabled={!message.trim()}
-            className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="p-2 bg-primary text-white rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <Send className="h-5 w-5" />
           </button>

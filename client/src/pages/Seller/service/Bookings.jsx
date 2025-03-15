@@ -10,6 +10,7 @@ const Bookings = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [bookings, setBookings] = useState([]);
+  const [showChat, setShowChat] = useState(false);
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
   const sellerId = currentUser?._id;
 
@@ -54,6 +55,10 @@ const Bookings = () => {
         autoClose: 1500,
       });
     }
+  };
+
+  const handleToggleChat = () => {
+    setShowChat((prev) => !prev);
   };
 
   return (
@@ -183,10 +188,10 @@ const Bookings = () => {
                   {selectedBooking.notes || "No additional notes"}
                 </p>
               </div>
-
               <div
                 className={`${
-                  selectedBooking?.jobStatus === "Completed" || "Cancelled"
+                  selectedBooking?.jobStatus === "Completed" ||
+                  selectedBooking?.jobStatus === "Cancelled"
                     ? "hidden"
                     : "flex space-x-3 mt-4"
                 }`}
@@ -195,18 +200,35 @@ const Bookings = () => {
                   onClick={() => handleBooking(selectedBooking._id)}
                   name={"Completed Booking"}
                   disabled={
-                    selectedBooking?.jobStatus === "Completed" || "Cancelled"
+                    selectedBooking?.jobStatus === "Completed" || selectedBooking?.jobStatus === "Cancelled"
                   }
                 />
               </div>
+              <button
+                onClick={handleToggleChat}
+                className="w-full mt-2 bg-gray-900 text-white py-2 rounded-lg hover:bg-gray-600"
+              >
+                Contact {selectedBooking.customer?.username}
+              </button>
             </>
           ) : (
             <p className="text-gray-500">Select a booking to view details.</p>
           )}
         </Card>
       </div>
-      {selectedBooking && (
-        <Chat userId={sellerId} receiverId={selectedBooking.customer?._id} />
+      {/* Chat Box (Visible When Contact Me Clicked) */}
+      {showChat && (
+        <div className="fixed bottom-5 right-5 w-[350px] bg-white shadow-lg rounded-lg">
+          {/* Chat Component */}
+          {selectedBooking && (
+            <Chat
+              userId={sellerId}
+              receiverId={selectedBooking.customer?._id}
+              onClose={handleToggleChat}
+              receiverName={selectedBooking.customer?.username}
+            />
+          )}
+        </div>
       )}
     </div>
   );
