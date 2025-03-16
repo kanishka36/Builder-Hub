@@ -56,7 +56,7 @@ export const editSeller = async (req, res) => {
   try {
     const { id } = req.params;
     const { username, email, imageUrl, address, phoneNumber } = req.body;
-    console.log(username, email, imageUrl, address, phoneNumber)
+    console.log(username, email, imageUrl, address, phoneNumber);
 
     const updatedSeller = await Seller.findByIdAndUpdate(
       id,
@@ -130,6 +130,39 @@ export const viewSupplier = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "An error occurred while fetching suppliers",
+      error: error.message,
+    });
+  }
+};
+
+export const updateSellerLocation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { lat, lng } = req.body; // Extract lat & lng from frontend
+
+    if (!lat || !lng) {
+      return res.status(400).json({ success: false, message: "Latitude and longitude are required." });
+    }
+
+    const updatedSeller = await Seller.findByIdAndUpdate(
+      id,
+      { location: { type: "Point", coordinates: [lng, lat] } }, // GeoJSON format (lng first, lat second)
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedSeller) {
+      return res.status(404).json({ success: false, message: "Seller not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Seller location updated successfully",
+      data: updatedSeller,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while updating location",
       error: error.message,
     });
   }

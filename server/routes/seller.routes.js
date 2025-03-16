@@ -2,6 +2,7 @@ import express from "express";
 import {
   deleteSeller,
   editSeller,
+  updateSellerLocation,
   viewSeller,
   viewSingleSeller,
   viewSupplier,
@@ -13,6 +14,7 @@ sellerRoutes.get("/view-seller", viewSeller);
 sellerRoutes.get("/view-seller/:id", viewSingleSeller);
 sellerRoutes.put("/edit-seller/:id", editSeller);
 sellerRoutes.delete("/delete-seller/:id", deleteSeller);
+sellerRoutes.put("/location/:id", updateSellerLocation)
 
 
 sellerRoutes.get("/view-suppliers", viewSupplier);
