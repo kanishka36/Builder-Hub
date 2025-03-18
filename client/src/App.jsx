@@ -25,6 +25,7 @@ import Bookings from "./pages/Seller/service/Bookings";
 import CustomerPrivateRoutes from "./components/routes/CustomerPrivateRoutes";
 import CProfile from "./pages/Customer/Profile/CProfile";
 import Inquiries from "./pages/Seller/Inquiries";
+import CSellerProfile from "./pages/Customer/CSellerProfile";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         <Route element={<CustomerPrivateRoutes />}>
           <Route path="/services/:serviceId" element={<CustomerLayout component={CServiceDetails} />} /> 
           <Route path="/user/profile" element={<CustomerLayout component={CProfile} />} /> 
+          <Route path="/seller-profile/:sellerId" element={<CustomerLayout component={CSellerProfile} />} />
         </Route>
         <Route path="/" element={<CustomerLayout component={Home} />} />
         <Route path="/services" element={<CustomerLayout component={CServices} />} />

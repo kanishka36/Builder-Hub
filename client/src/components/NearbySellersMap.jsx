@@ -7,6 +7,7 @@ import {
 } from "@react-google-maps/api";
 import axios from "axios";
 import ActionButton from "../components/Button/ActionButton";
+import { useNavigate } from "react-router-dom";
 
 const mapContainerStyle = { width: "100%", height: "400px" };
 const defaultCenter = { lat: 6.9271, lng: 79.8612 }; // Default: Colombo, Sri Lanka
@@ -21,6 +22,7 @@ const NearbySellersMap = ({ userLocation }) => {
   const [searchInput, setSearchInput] = useState("");
   const [selectedSeller, setSelectedSeller] = useState(null); // State to track hovered seller
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (userLocation) {
@@ -113,7 +115,7 @@ const NearbySellersMap = ({ userLocation }) => {
             }}
             onCloseClick={() => setSelectedSeller(null)}
           >
-            <div>
+            <div onClick={()=> navigate(`/seller-profile/${selectedSeller._id}`)}>
               <h3>{selectedSeller.name}</h3>
               <p>
                 <strong>Name:</strong> {selectedSeller.username}
