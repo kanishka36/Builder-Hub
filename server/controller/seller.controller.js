@@ -141,7 +141,12 @@ export const updateSellerLocation = async (req, res) => {
     const { lat, lng } = req.body; // Extract lat & lng from frontend
 
     if (!lat || !lng) {
-      return res.status(400).json({ success: false, message: "Latitude and longitude are required." });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Latitude and longitude are required.",
+        });
     }
 
     const updatedSeller = await Seller.findByIdAndUpdate(
@@ -151,7 +156,9 @@ export const updateSellerLocation = async (req, res) => {
     );
 
     if (!updatedSeller) {
-      return res.status(404).json({ success: false, message: "Seller not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Seller not found" });
     }
 
     return res.status(200).json({
@@ -165,5 +172,33 @@ export const updateSellerLocation = async (req, res) => {
       message: "An error occurred while updating location",
       error: error.message,
     });
+  }
+};
+
+export const nearbySellerSearch = async (req, res) => {
+  try {
+    const { longitude, latitude, radius } = req.query; // Get location from query parameters
+
+    if (!longitude || !latitude || !radius) {
+      return res
+        .status(400)
+        .json({ message: "Longitude, latitude, and radius are required." });
+    }
+
+    const sellers = await Seller.find({
+      location: {
+        $near: {
+          $geometry: {
+            type: "Point",
+            coordinates: [parseFloat(longitude), parseFloat(latitude)],
+          },
+          $maxDistance: parseFloat(radius) * 1000, // Convert km to meters
+        },
+      },
+    }).populate("role", "name").select("username role category location.coordinates");
+
+    res.json(sellers);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching sellers", error });
   }
 };

@@ -4,6 +4,8 @@ import { Star } from "lucide-react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import LoadingPage from "../../components/UI/LoadingPage";
+import NearbySellersMap from "../../components/NearbySellersMap";
+import ActionButton from "../../components/Button/ActionButton";
 
 // const services = [
 //   {
@@ -48,7 +50,12 @@ const ServiceCard = ({ service }) => {
 const CServices = () => {
   const [services, setService] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [toggle, setToggle] = useState(false);
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
+
+  const handleToggle = () => {
+    setToggle(!toggle);
+  }
 
   const fetchService = async () => {
     try {
@@ -74,6 +81,14 @@ const CServices = () => {
 
   return (
     <div className="container mx-auto p-6">
+      <div className="flex justify-end items-center">
+        <div className="flex gap-3">
+          <p className="text-2xl font-thin">{`${toggle ? "" : "Find Your Seller Near By Your Location"}`}</p>
+          <ActionButton name={`${toggle ? "Close" : "Click"}`} onClick={()=> handleToggle()} />
+        </div>
+      </div>
+      
+      {toggle && <div className="my-3"><NearbySellersMap /></div>}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {services.map((service) => (
           <Link key={service._id} to={`/services/${service._id}`}>

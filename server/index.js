@@ -32,13 +32,13 @@ const io = new Server(server, {
 const users = {};
 
 io.on("connection", (socket) => {
-  console.log("✅ A user connected:", socket.id);
+  // console.log("✅ A user connected:", socket.id);
 
   // When a user joins, store their userId and socketId
   socket.on("join", async ({ userId, receiverId }) => {
     users[userId] = socket.id;
-    console.log(`User ${userId} connected with socket ID ${socket.id}`);
-    console.log(`Receiver ${receiverId} connected with socket ID ${socket.id}`);
+    // console.log(`User ${userId} connected with socket ID ${socket.id}`);
+    // console.log(`Receiver ${receiverId} connected with socket ID ${socket.id}`);
 
     try {
       const chatHistory = await Chat.find({
@@ -72,10 +72,9 @@ io.on("connection", (socket) => {
     }
   });
 
-
   // Handle disconnection
   socket.on("disconnect", () => {
-    console.log("❌ A user disconnected:", socket.id);
+    // console.log("❌ A user disconnected:", socket.id);
 
     // Remove disconnected user from users object
     Object.keys(users).forEach((userId) => {

@@ -4,7 +4,7 @@ import TextField from "../../components/Form/TextField";
 import SelectField from "../../components/Form/SelectField";
 import * as Yup from "yup";
 import axios from "axios";
-import ActionButton from "../../components/Button/ActionButton";
+import SubmitButton from "../../components/Button/SubmitButton";
 import { Link, useNavigate } from "react-router-dom";
 import RadioField from "../../components/Form/RadioField";
 import { toast } from "react-toastify";
@@ -16,19 +16,21 @@ const SellerRegister = () => {
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
 
   // Fetch roles function (useCallback to prevent re-creation)
-  const fetchRoles = useCallback(async (category) => {
-    if (!category) return;
-    try {
-      const res = await axios.get(`${apiUrl}/api/view-role/${category}`, {
-        withCredentials: true,
-      });
-      setRoles(res.data.data);
-    } catch (error) {
-      setRoles([]);
-      console.error("Failed to fetch roles:", error);
-    }
-  }, [apiUrl]);
-
+  const fetchRoles = useCallback(
+    async (category) => {
+      if (!category) return;
+      try {
+        const res = await axios.get(`${apiUrl}/api/view-role/${category}`, {
+          withCredentials: true,
+        });
+        setRoles(res.data.data);
+      } catch (error) {
+        setRoles([]);
+        console.error("Failed to fetch roles:", error);
+      }
+    },
+    [apiUrl]
+  );
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
@@ -99,9 +101,13 @@ const SellerRegister = () => {
               />
               <SelectField name="role" label="Role" items={roles} />
               <TextField type="password" name="password" label="Password" />
-              <TextField type="password" name="confirmPassword" label="Confirm Password" />
+              <TextField
+                type="password"
+                name="confirmPassword"
+                label="Confirm Password"
+              />
               <div>
-                <ActionButton name="Register" disabled={isSubmitting} />
+                <SubmitButton name="Register" disabled={isSubmitting} />
               </div>
             </Form>
           );
