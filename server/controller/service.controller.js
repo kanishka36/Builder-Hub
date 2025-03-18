@@ -2,8 +2,12 @@ import { Service } from "../model/service.model.js";
 import { Seller } from "../model/seller.model.js";
 
 export const addService = async (req, res) => {
-  const { title, description, price } = req.body;
+  let { title, description, price, images} = req.body;
   const { sellerId } = req.params;
+
+  if (Array.isArray(images) && images.length > 0) {
+    images = images[0]; 
+  }
 
   const seller = await Seller.findById(sellerId).select(
     "-password -resetPasswordToken -resetPasswordExpires"
@@ -29,6 +33,7 @@ export const addService = async (req, res) => {
       description: description,
       price: price,
       seller: seller._id,
+      imageUrl: images,
     });
 
     return res.status(201).json({
@@ -47,7 +52,9 @@ export const addService = async (req, res) => {
 // View All Services
 export const viewService = async (req, res) => {
   try {
-    const services = await Service.find().populate("seller", "username imageUrl").exec();
+    const services = await Service.find()
+      .populate("seller", "username imageUrl")
+      .exec();
 
     if (!services || services.length === 0) {
       return res.status(404).json({
@@ -99,11 +106,11 @@ export const viewSingleService = async (req, res) => {
 export const editService = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, price } = req.body;
+    const { title, description, price, imageUrl } = req.body;
 
     const updatedService = await Service.findByIdAndUpdate(
       id,
-      { title, description, price },
+      { title, description, price, imageUrl },
       { new: true, runValidators: true }
     );
 

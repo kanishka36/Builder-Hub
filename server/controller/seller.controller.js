@@ -56,7 +56,6 @@ export const editSeller = async (req, res) => {
   try {
     const { id } = req.params;
     const { username, email, imageUrl, address, phoneNumber } = req.body;
-    console.log(username, email, imageUrl, address, phoneNumber);
 
     const updatedSeller = await Seller.findByIdAndUpdate(
       id,
