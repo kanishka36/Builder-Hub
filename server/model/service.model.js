@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { Booking } from "./booking.model.js";
+import { Review } from "./review.model.js";
 
 const serviceManageSchema = new mongoose.Schema(
   {
@@ -33,6 +34,7 @@ serviceManageSchema.pre("findOneAndDelete", async function (next) {
     const service = await this.model.findOne(this.getFilter());
     if (service) {
       await Booking.deleteMany({ service: service._id });
+      await Review.deleteMany({jobId: service._id, reviewType: "Service"})
     }
     next();
   } catch (error) {

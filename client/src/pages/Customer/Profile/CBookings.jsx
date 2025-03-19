@@ -5,10 +5,12 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import ActionButton from "../../../components/Button/ActionButton";
 import { toast } from "react-toastify";
+import AddReview from "../../../components/AddReview";
 
 const CBookings = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [booking, setBooking] = useState([]);
+  const [serviceId, setServiceId] = useState(null);
 
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
   const userId = currentUser?._id;
@@ -26,7 +28,7 @@ const CBookings = () => {
       return;
     }
     try {
-      const res = await axios.put(
+      await axios.put(
         `${apiUrl}/api/update-jobstatus/${id}`,
         jobStatus,
         { withCredentials: true }
@@ -153,6 +155,13 @@ const CBookings = () => {
                 />
               )
             )}
+
+              {!isFutureBooking && !isJobCancelled && (
+                <ActionButton
+                  name={"Add Review"}
+                  onClick={() => setServiceId(row._id)}
+                />
+              )}
           </div>
         );
       },
@@ -162,10 +171,18 @@ const CBookings = () => {
 
   return (
     <div className="relative">
+      {serviceId !== null && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" ></div>
+      )}
       <h1 className="text-2xl font-medium text-gray-800 mb-6">My Bookings</h1>
       <div>
         <Table columns={columns} data={booking} />
       </div>
+      {serviceId !== null && (
+        <div className="absolute top-0 left-[25%] z-50">
+          <AddReview jobId={serviceId} reviewType={"Service"} onClose={() => setServiceId(null)} />
+        </div>
+      )}
     </div>
   );
 };

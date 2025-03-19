@@ -22,26 +22,34 @@ import ActionButton from "../../components/Button/ActionButton";
 
 const ServiceCard = ({ service }) => {
   return (
-    <Card className="rounded-lg shadow-lg overflow-hidden">
-      <img
-        src={service.image}
-        alt={service.title}
-        className="w-full h-40 object-cover"
-      />
+    <Card className="rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+      <div className="w-full h-44 bg-gray-200 flex items-center justify-center">
+        {service.imageUrl ? (
+          <img
+            src={service.imageUrl}
+            alt={service.title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <span className="text-gray-500 text-sm">No Image Available</span>
+        )}
+      </div>
+ 
       <div className="p-4">
-        <h2 className="text-lg font-semibold">{service.title}</h2>
+        <h2 className="text-lg font-semibold truncate">{service.title}</h2>
         <p className="text-sm text-gray-600">{service.seller?.username}</p>
+
         <div className="flex items-center mt-2">
-          <Star className="text-yellow-500" />
-          <span className="ml-1 font-semibold">{service.rating}</span>
+          <Star className="text-yellow-500 w-4 h-4" />
+          <span className="ml-1 font-semibold">{service.rating || "0.0"}</span>
           <span className="text-gray-500 ml-2">
-            ({service.reviews} reviews)
+            ({service.reviews || "0"} reviews)
           </span>
         </div>
-        <p className="mt-2 font-semibold">From ${service.price}</p>
-        <span className="inline-block mt-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-          {service.tag}
-        </span>
+
+        <p className="mt-2 text-md font-semibold text-gray-800">
+          From ${service.price}
+        </p>
       </div>
     </Card>
   );
