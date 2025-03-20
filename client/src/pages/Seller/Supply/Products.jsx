@@ -48,6 +48,10 @@ const Products = () => {
     fetchProduct();
   }, []);
 
+  const handleEdit = (product) => {
+    navigate(`/dashboard/edit-product/${product._id}`, { state: { product } });
+  };
+
   const columns = [
     { header: "Name", accessor: "name" },
     { header: "Description", accessor: "description" },
@@ -57,7 +61,7 @@ const Products = () => {
       header: "Action",
       render: (row) => (
         <div className="flex items-center space-x-4">
-          <EditButton onClick={() => navigate(`/dashboard/edit-product/${row._id}`)} />
+          <EditButton onClick={() => handleEdit(row)} />
           <DeleteButton onClick={() => handleDelete(row._id)} />
         </div>
       ),

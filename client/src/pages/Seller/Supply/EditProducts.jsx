@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Formik } from "formik";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import * as Yup from "yup";
 import SubmitButton from "../../../components/Button/SubmitButton";
 import Card from "../../../components/UI/Card";
@@ -8,26 +8,47 @@ import TextField from "../../../components/Form/TextField";
 import axios from "axios";
 import TextArea from "../../../components/Form/TextArea";
 import { toast } from "react-toastify";
-import { useSelector } from "react-redux";
 import FileUpload from "../../../components/Form/FileUpload";
 
 const EditProducts = () => {
-  const { currentUser } = useSelector((state) => state.user);
+
+  const { state } = useLocation(); // Get the passed product data
+  const navigate = useNavigate();
+
+  const product = state?.product; // Extract product data
+
+  // If no product is passed, redirect back
+  useEffect(() => {
+    if (!product) {
+      navigate("/dashboard/products");
+    }
+  }, [product, navigate]);
+
+  // Initial values directly from state (No need to fetch!)
+  const initialValues = {
+    name: product?.name || "",
+    description: product?.description || "",
+    price: product?.price || "",
+    images: product?.images || [],
+    quantity: product?.quantity || "",
+  };
+
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
 
-  const productId = useParams();
+  const {productId} = useParams();
 
   // Handle Form Submission
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     console.log(values);
     try {
-      await axios.post(`${apiUrl}/api/edit-product/${productId}`, values, {
+      await axios.put(`${apiUrl}/api/edit-product/${productId}`, values, {
         withCredentials: true,
       });
       toast.success("Product added successfully", {
         position: "top-center",
         autoClose: 1500,
       });
+      navigate('/dashboard/products')
       resetForm();
     } catch (error) {
       console.error("Error adding product:", error);
@@ -57,14 +78,9 @@ const EditProducts = () => {
 
       <Card>
         <Formik
-          initialValues={{
-            name: "",
-            description: "",
-            price: "",
-            images: [],
-            quantity: "",
-          }}
+          initialValues={initialValues}
           validationSchema={validationSchema}
+          enableReinitialize={true}
           onSubmit={handleSubmit}
         >
           {({ setFieldValue, isSubmitting }) => (
