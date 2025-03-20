@@ -10,7 +10,8 @@ import AddReview from "../../../components/AddReview";
 const CBookings = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [booking, setBooking] = useState([]);
-  const [serviceId, setServiceId] = useState(null);
+  const [review, setReview] = useState(null);
+  const [selectedBooking, setSelectedBooking] = useState(null);
 
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
   const userId = currentUser?._id;
@@ -92,10 +93,30 @@ const CBookings = () => {
       console.log("Failed to fetch bookings:", error);
     }
   };
+  
+  const fetchReviewedBookings = async () => {
+    try {
+      const res = await axios.get(
+        `${apiUrl}/api/view-user-review/${userId}`,
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(res)
+      setReview(res.data.data);
+    } catch (error) {
+      console.log("Failed to fetch bookings:", error);
+    }
+  }
+
+  console.log(review, "reviews")
+  console.log(booking, "booking")
 
   useEffect(() => {
     fetchBooking();
+    fetchReviewedBookings();
   }, []);
+  
 
   const columns = [
     { header: "ID", accessor: "_id" },
@@ -129,6 +150,9 @@ const CBookings = () => {
         const isJobCompleted = row.jobStatus === "Completed";
         const isJobCancelled = row.jobStatus === "Cancelled";
         const isUserConformed = row.userStatus === "Conformed";
+        const isAlreadyReviewed = review?.some(
+          (rev) => rev.orderId === row._id && rev.jobId === row.service._id
+        );
     
         return (
           <div className="flex items-center space-x-4">
@@ -156,10 +180,10 @@ const CBookings = () => {
               )
             )}
 
-              {!isFutureBooking && !isJobCancelled && (
+              {!isFutureBooking && !isJobCancelled && !isAlreadyReviewed && (
                 <ActionButton
                   name={"Add Review"}
-                  onClick={() => setServiceId(row._id)}
+                  onClick={() => setSelectedBooking({serviceId: row.service._id, bookingId: row._id})}
                 />
               )}
           </div>
@@ -171,16 +195,24 @@ const CBookings = () => {
 
   return (
     <div className="relative">
-      {serviceId !== null && (
+      {selectedBooking !== null && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" ></div>
       )}
       <h1 className="text-2xl font-medium text-gray-800 mb-6">My Bookings</h1>
       <div>
         <Table columns={columns} data={booking} />
       </div>
-      {serviceId !== null && (
+      {selectedBooking && (
         <div className="absolute top-0 left-[25%] z-50">
-          <AddReview jobId={serviceId} reviewType={"Service"} onClose={() => setServiceId(null)} />
+          <AddReview
+            jobId={selectedBooking}
+            reviewType={"Service"}
+            orderType={"Booking"}
+            onClose={() => {
+              setSelectedBooking(null);
+              fetchReviewedBookings(); // ✅ Fetch updated reviews when closing
+            }}
+          />
         </div>
       )}
     </div>

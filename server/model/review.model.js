@@ -27,6 +27,16 @@ const reviewSchema = new mongoose.Schema(
         required: true,
         enum: ["Service", "Product"],
       },
+      orderId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        refPath: "orderType",
+      },
+      orderType: {
+        type: String,
+        required: true,
+        enum: ["Booking", "Order"]
+      }
     },
     { timestamps: true }
   );

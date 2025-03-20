@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import axios from "axios";
 
-const AddReview = ({ onClose, jobId, reviewType }) => {
+const AddReview = ({ onClose, jobId, reviewType, orderType }) => {
   const [rating, setRating] = useState(0);
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
   const { currentUser } = useSelector((state) => state.user);
@@ -27,17 +27,21 @@ const AddReview = ({ onClose, jobId, reviewType }) => {
 
   const handleSubmit = async (values, { resetForm }) => {
     const reviewData = {
-      jobId: jobId, 
+      jobId: jobId.serviceId, 
+      orderId: jobId.bookingId,
       review: values.review,
       rating: values.rating,
       userId: userId,
       reviewType: reviewType,
+      orderType: orderType,
     };
 
     try {
       await axios.post(`${apiUrl}/api/add-reviews`, reviewData, {
         withCredentials: true,
       });
+
+      console.log(reviewData)
 
       toast.success("Review Submitted Successfully", {
         position: "top-center",
