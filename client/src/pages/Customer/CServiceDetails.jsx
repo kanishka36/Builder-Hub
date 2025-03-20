@@ -11,7 +11,7 @@ import Chat from "../../components/Chat";
 import { X } from "lucide-react";
 
 const CServiceDetails = () => {
-  const review = {
+  const review1 = {
     username: "Johnolszew",
     country: "Canada",
     rating: 5,
@@ -33,8 +33,6 @@ const CServiceDetails = () => {
   const { currentUser } = useSelector((state) => state.user);
   const customerId = currentUser?._id;
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
-
-  console.log(service, "service");
 
   useEffect(() => {
     const fetchService = async () => {
@@ -257,11 +255,7 @@ const CServiceDetails = () => {
         <Card className="mt-6">
           <div className="text-lg font-bold mb-4">Reviews</div>
           <ReviewBox
-            username={review.username}
-            rating={review.rating}
-            timeAgo={review.timeAgo}
-            comment={review.comment}
-            sellerResponse={review.comment}
+            serviceId={serviceId}
           />
         </Card>
       </div>

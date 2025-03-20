@@ -7,20 +7,37 @@ import LoadingPage from "../../components/UI/LoadingPage";
 import NearbySellersMap from "../../components/NearbySellersMap";
 import ActionButton from "../../components/Button/ActionButton";
 
-// const services = [
-//   {
-//     id: 1,
-//     title: "Professional Squarespace Website",
-//     name: "David Narclso",
-//     rating: 5.0,
-//     reviews: 204,
-//     price: 160,
-//     tag: "Fiverr's Choice",
-//     image: "/images/service1.png",
-//   },
-// ];
-
 const ServiceCard = ({ service }) => {
+  const [reviews, setReviews] = useState([])
+  const apiUrl = import.meta.env.VITE_ROUTE_URL;
+  const fetchReview = async () => {
+    try {
+      const res = await axios.get(
+        `${apiUrl}/api/view-review/${service._id}`,
+        {
+          withCredentials: true,
+        }
+      );
+      setReviews(res.data.data);
+    } catch (error) {
+      console.log("Failed to fetch bookings:", error);
+    }
+  }
+
+  useEffect(()=> {
+    fetchReview();
+  }, [])
+
+  const calculateAverageRating = (reviews) => {
+    if(!reviews.length) return 0;
+
+    const total = reviews.reduce((sum, review)=> sum + review.rating, 0)
+    return (total/ reviews.length).toFixed(1);
+  }
+
+  const rating = calculateAverageRating(reviews)
+  const reviewCount = reviews.length;
+
   return (
     <Card className="rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
       <div className="w-full h-44 bg-gray-200 flex items-center justify-center">
@@ -41,9 +58,9 @@ const ServiceCard = ({ service }) => {
 
         <div className="flex items-center mt-2">
           <Star className="text-yellow-500 w-4 h-4" />
-          <span className="ml-1 font-semibold">{service.rating || "0.0"}</span>
+          <span className="ml-1 font-semibold">{ rating || "0.0"}</span>
           <span className="text-gray-500 ml-2">
-            ({service.reviews || "0"} reviews)
+            ({reviewCount || "0"} reviews)
           </span>
         </div>
 

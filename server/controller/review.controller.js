@@ -38,8 +38,9 @@ export const addReview = async (req, res) => {
 // View All Reviews
 export const viewReview = async (req, res) => {
   try {
-    const reviews = await Review.find()
-      .populate("user", "username imageUrl")
+    const { jobId } = req.params;
+    const reviews = await Review.find({jobId: jobId})
+      .populate("userId", "username imageUrl")
       .exec();
 
     if (!reviews || reviews.length === 0) {
@@ -65,7 +66,6 @@ export const viewReview = async (req, res) => {
 export const viewUserReview = async (req, res) => {
   try {
     const { userId } = req.params;
-    console.log(userId)
     const reviews = await Review.find({userId: userId })
       .populate("userId", "username imageUrl")
       .exec();

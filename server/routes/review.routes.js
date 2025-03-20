@@ -4,5 +4,5 @@ import {addReview, viewReview, viewUserReview} from "../controller/review.contro
 export const reviewRoutes = express.Router();
 
 reviewRoutes.post("/add-reviews", addReview);
-reviewRoutes.get("/view-review", viewReview)
+reviewRoutes.get("/view-review/:jobId", viewReview)
 reviewRoutes.get("/view-user-review/:userId", viewUserReview)
