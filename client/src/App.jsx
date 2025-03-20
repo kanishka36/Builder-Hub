@@ -27,6 +27,10 @@ import CProfile from "./pages/Customer/Profile/CProfile";
 import Inquiries from "./pages/Seller/Inquiries";
 import CSellerProfile from "./pages/Customer/CSellerProfile";
 import AddReview from "./components/AddReview";
+import CShop from "./pages/Customer/CShop";
+import Products from "./pages/Seller/Supply/Products";
+import AddProduct from "./pages/Seller/Supply/AddProducts"
+import EditProducts from "./pages/Seller/Supply/EditProducts";
 
 function App() {
   return (
@@ -38,6 +42,7 @@ function App() {
           <Route path="/user/profile" element={<CustomerLayout component={CProfile} />} /> 
           <Route path="/seller-profile/:sellerId" element={<CustomerLayout component={CSellerProfile} />} />
           <Route path="/add-review/:sellerId" element={<CustomerLayout component={AddReview} />} />
+          <Route path="/shop/:supplierId" element={<CustomerLayout component={CShop} />} />
         </Route>
         <Route path="/" element={<CustomerLayout component={Home} />} />
         <Route path="/services" element={<CustomerLayout component={CServices} />} />
@@ -54,12 +59,15 @@ function App() {
         <Route path="/dashboard/my-profile" element={<AdminLayout component={Dashboard} />} />
         <Route path="/dashboard/services" element={<AdminLayout component={Services} />} />
         <Route path="/dashboard/add-services" element={<AdminLayout component={AddService} />} />
+        <Route path="/dashboard/add-product" element={<AdminLayout component={AddProduct} />} />
         <Route path="/dashboard/bookings" element={<AdminLayout component={Bookings} />} />
         <Route path="/dashboard/seller-manage" element={<AdminLayout component={ASellerManage} />} />
         <Route path="/dashboard/seller-role" element={<AdminLayout component={ASellerRole} />} />
         <Route path="/dashboard/add-seller-role" element={<AdminLayout component={AAddSellerRole} />} />
         <Route path="/dashboard/orders" element={<AdminLayout component={Orders} />} />
         <Route path="/dashboard/inquiries" element={<AdminLayout component={Inquiries} />} />
+        <Route path="/dashboard/products" element={<AdminLayout component={Products} />} />
+        <Route path="/dashboard/edit-product/:productId" element={<AdminLayout component={EditProducts} />} />
       </Routes>
     </BrowserRouter>
   );

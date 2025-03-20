@@ -4,7 +4,13 @@ const ActionButton = ({ onClick, name, type = "button", disabled }) => {
   return (
     <button
       type={type}
-      className={`${disabled?"bg-yellow-200":"bg-primary"} px-2 py-1 rounded-md`}
+      className={`px-2 py-1 rounded-md transition-all 
+        ${
+          disabled
+            ? "bg-yellow-200 cursor-not-allowed"
+            : "bg-primary cursor-pointer hover:bg-primary-dark"
+        }
+      `}
       onClick={onClick}
       disabled={disabled}
     >

@@ -13,12 +13,13 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
   const menu = [
     { name: "My Profile", path: "/dashboard/my-profile" },
-    { name: "Service Manage", path: "/dashboard/services" },
-    ...(role == "supplier" ? [
-      { name: "Order Manage", path: "/dashboard/orders" },
-    ]:[]),
     ...(role == "service-provider" ? [
       { name: "Bookings", path: "/dashboard/bookings" },
+      { name: "Service Manage", path: "/dashboard/services" },
+    ]:[]),
+    ...(role == "supplier" ? [
+      { name: "Products Manage", path: "/dashboard/products" },
+      { name: "Order Manage", path: "/dashboard/orders" },
     ]:[]),
     ...(role == "admin"
       ? [

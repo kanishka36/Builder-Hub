@@ -4,6 +4,7 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import Card from "../components/UI/Card";
 import ActionButton from "../components/Button/ActionButton";
+import SubmitButton from "../components/Button/SubmitButton";
 import TextField from "../components/Form/TextField";
 import FileUpload from "../components/Form/FileUpload";
 import { toast } from "react-toastify";
@@ -20,7 +21,7 @@ const Dashboard = () => {
 
   // Initial values for Formik
   const initialValues = {
-    images: currentUser?.imageUrl || [],
+    imageUrl: currentUser?.imageUrl || [],
     username: currentUser?.username || "",
     email: currentUser?.email || "",
     address: currentUser?.address || "",
@@ -116,11 +117,11 @@ const Dashboard = () => {
                       <Form className="space-y-2">
                         <div>
                           <FileUpload
-                            name="images"
+                            name="imageUrl"
                             label={"Uploade Profile Picture"}
                             onUploadComplete={(uploadedURLs) => {
                               console.log("Uploaded URLs:", uploadedURLs); // Debugging
-                              setFieldValue("images", uploadedURLs);
+                              setFieldValue("imageUrl", uploadedURLs);
                             }}
                             multiple={false}
                           />
@@ -145,7 +146,7 @@ const Dashboard = () => {
                         </div>
 
                         <div className="flex space-x-4">
-                          <ActionButton type="submit" name="Save" />
+                          <SubmitButton name="Save" disabled={isSubmitting} />
                           <ActionButton
                             type="button"
                             name="Cancel"
@@ -157,7 +158,9 @@ const Dashboard = () => {
                   </Formik>
                   <div className="">
                     <div className="flex gap-3">
-                    <div className="text-xl font-semibold">Update Geographical Location</div>
+                      <div className="text-xl font-semibold">
+                        Update Geographical Location
+                      </div>
                       <ActionButton
                         name={`${toggle ? "Cancel" : "Edit"}`}
                         onClick={handleEdit}

@@ -55,7 +55,12 @@ export const viewSingleSeller = async (req, res) => {
 export const editSeller = async (req, res) => {
   try {
     const { id } = req.params;
-    const { username, email, imageUrl, address, phoneNumber } = req.body;
+    let { username, email, imageUrl, address, phoneNumber } = req.body;
+
+    if (Array.isArray(imageUrl) && imageUrl.length > 0) {
+      imageUrl = imageUrl[0];
+    }
+    console.log(username, email, imageUrl, address, phoneNumber);
 
     const updatedSeller = await Seller.findByIdAndUpdate(
       id,
@@ -140,12 +145,10 @@ export const updateSellerLocation = async (req, res) => {
     const { lat, lng } = req.body; // Extract lat & lng from frontend
 
     if (!lat || !lng) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Latitude and longitude are required.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Latitude and longitude are required.",
+      });
     }
 
     const updatedSeller = await Seller.findByIdAndUpdate(
@@ -194,10 +197,39 @@ export const nearbySellerSearch = async (req, res) => {
           $maxDistance: parseFloat(radius) * 1000, // Convert km to meters
         },
       },
-    }).populate("role", "name").select("username role category location.coordinates");
+    })
+      .populate("role", "name")
+      .select("username role category location.coordinates");
 
     res.json(sellers);
   } catch (error) {
     res.status(500).json({ message: "Error fetching sellers", error });
+  }
+};
+
+export const viewSuplliers = async (req, res) => {
+  try {
+    const sellers = await Seller.find({ category: "supplier" })
+      .populate("role", "name")
+      .select("-password -resetPasswordToken -fcmToken")
+      .exec();
+
+    if (!sellers || sellers.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No sellers found!",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Seller retrieved successfully",
+      data: sellers,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching sellers",
+      error: error.message,
+    });
   }
 };

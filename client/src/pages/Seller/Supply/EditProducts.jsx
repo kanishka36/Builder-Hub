@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Form, Formik } from "formik";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import * as Yup from "yup";
 import SubmitButton from "../../../components/Button/SubmitButton";
 import Card from "../../../components/UI/Card";
@@ -11,17 +11,17 @@ import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import FileUpload from "../../../components/Form/FileUpload";
 
-const AddProducts = () => {
+const EditProducts = () => {
   const { currentUser } = useSelector((state) => state.user);
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
 
-  const sellerId = currentUser._id;
+  const productId = useParams();
 
   // Handle Form Submission
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     console.log(values);
     try {
-      await axios.post(`${apiUrl}/api/add-product/${sellerId}`, values, {
+      await axios.post(`${apiUrl}/api/edit-product/${productId}`, values, {
         withCredentials: true,
       });
       toast.success("Product added successfully", {
@@ -53,7 +53,7 @@ const AddProducts = () => {
       <Link to="/" className="text-blue-700">
         Back
       </Link>
-      <h2 className="text-2xl font-semibold mb-6">Add Service</h2>
+      <h2 className="text-2xl font-semibold mb-6">Edit Product</h2>
 
       <Card>
         <Formik
@@ -101,4 +101,4 @@ const AddProducts = () => {
   );
 };
 
-export default AddProducts;
+export default EditProducts;
