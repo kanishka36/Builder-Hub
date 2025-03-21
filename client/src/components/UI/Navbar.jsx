@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 
 const Navbar = () => {
   const { currentUser } = useSelector((state) => state.user);
+  const cartItemCount = useSelector((state) => state.cart.cartItemCount);
 
   return (
     <nav className="bg-gray-900 text-white p-6 fixed top-0 left-0 w-full z-50">
@@ -38,7 +39,7 @@ const Navbar = () => {
           <Link className="relative cursor-pointer" to={"/cart"}>
             <ShoppingCart className="text-primary" size={24} />
             <div className="absolute top-0 right-0 bg-primary text-black text-xs font-bold rounded-full px-1">
-              2
+              {cartItemCount}
             </div>
           </Link>
         </div>

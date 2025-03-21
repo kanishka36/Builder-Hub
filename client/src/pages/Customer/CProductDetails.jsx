@@ -5,10 +5,17 @@ import ActionButton from "../../components/Button/ActionButton";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { fetchCartItems } from "../../redux/user/cartSlice";
+import { handlePayment } from "../../utils/paymentUtils";
+import Card from "../../components/UI/Card";
+import { useSelector } from "react-redux";
 
 const ProductPage = () => {
   const { state } = useLocation();
   const product = state?.product;
+  const dispatch = useDispatch();
+  const { currentUser } = useSelector((state) => state.user);
 
   const [quantity, setQuantity] = useState(1);
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
@@ -40,6 +47,7 @@ const ProductPage = () => {
         position: "top-center",
         autoClose: 1500,
       });
+      dispatch(fetchCartItems());
     } catch (error) {
       console.log("Failed to add to cart:", error);
       toast.error("Failed to add to Cart", {
@@ -48,6 +56,21 @@ const ProductPage = () => {
       });
     }
   };
+
+  //payment
+  const handleCheckout = () => {
+    const selectedItem = product;
+    const sellerId = product.seller?._id;
+    const totalPrice = product?.price * quantity;
+    const customer = currentUser;
+
+    handlePayment({
+      selectedItem,
+      sellerId,
+      totalPrice,
+      customer
+    })
+  }
 
   // Settings for the main slider
   const mainSettings = {
@@ -84,7 +107,7 @@ const ProductPage = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-4 bg-white">
+    <Card className="max-w-6xl mx-auto p-4">
       <div className="flex flex-col md:flex-row gap-6">
         {/* Left side - Product Images with react-slick */}
         <div className="w-full md:w-2/5">
@@ -173,6 +196,16 @@ const ProductPage = () => {
             </div>
           </div>
 
+          {/* Seller */}
+          <div className="mt-4">
+            <div className="flex items-center">
+              <span className="text-gray-600 mr-4">Seller:</span>
+              <div className=" text-black px-2 text-sm flex items-center">
+                {product.seller?.username}
+              </div>
+            </div>
+          </div>
+
           {/* Quantity */}
           <div className="mt-6">
             <div className="flex items-center">
@@ -197,12 +230,12 @@ const ProductPage = () => {
 
           {/* Buttons */}
           <div className="mt-6 flex gap-4">
-            <ActionButton name={"Buy Now"} />
+            <ActionButton onClick={handleCheckout} name={"Buy Now"} />
             <ActionButton onClick={handleAddToCart} name={"Add to Cart"} />
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

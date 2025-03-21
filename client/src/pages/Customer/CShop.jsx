@@ -35,6 +35,7 @@ const ProductCard = ({ product }) => {
   const rating = calculateAverageRating(reviews);
   const reviewCount = reviews.length;
 
+
   return (
     <Card className="rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
       {/* Product Image */}
@@ -93,6 +94,8 @@ const CShop = () => {
       setLoading(false);
     }
   };
+
+  console.log(products)
 
   useEffect(() => {
     fetchProduct();
