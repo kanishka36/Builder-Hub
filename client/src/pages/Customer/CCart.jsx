@@ -5,6 +5,7 @@ import { Heart, Trash2 } from "lucide-react";
 import axios from "axios";
 import Card from "../../components/UI/Card";
 import ActionButton from "../../components/Button/ActionButton";
+import { handlePayment } from "../../utils/paymentUtils";
 
 const CCart = () => {
   const dispatch = useDispatch();
@@ -17,9 +18,8 @@ const CCart = () => {
     dispatch(fetchCartItems());
   }, [dispatch]);
 
-  
   const handleSelectItem = (item) => {
-    setSelectedItem(item); 
+    setSelectedItem(item);
   };
 
   // Handle Remove Item
@@ -36,6 +36,24 @@ const CCart = () => {
     } catch (error) {
       console.error("Failed to remove item:", error);
     }
+  };
+
+  const handleCheckout = () => {
+    console.log(selectedItem, "selected item");
+    handlePayment({
+      type: "product",
+      itemTitle: selectedItem.productId.name,
+      amount: selectedItem.productId.price * selectedItem.quantity,
+      customer: currentUser,
+      sellerId: selectedItem.productId.seller._id,
+      onSuccess: (orderId) => {
+        console.log("Product payment success!", orderId);
+        // Save product order logi here
+      },
+      onError: (err) => {
+        console.log("Product payment failed!", err);
+      },
+    });
   };
 
   return (
@@ -71,6 +89,13 @@ const CCart = () => {
                 <div className="text-sm font-medium">{item.productId.name}</div>
 
                 <div className="flex justify-between items-center mt-4">
+                  {/* Seller */}
+                  <div>
+                    <div className="text-orange-500 font-medium">
+                      {item.seller}
+                    </div>
+                  </div>
+
                   {/* Price */}
                   <div>
                     <div className="text-orange-500 font-medium">
@@ -128,7 +153,11 @@ const CCart = () => {
         </div>
 
         <div className="mt-4">
-          <ActionButton name={"Proceed to Checkout"} disabled={!selectedItem} />
+          <ActionButton
+            onClick={handleCheckout}
+            name={"Proceed to Checkout"}
+            disabled={!selectedItem}
+          />
         </div>
       </Card>
     </div>

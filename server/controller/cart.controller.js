@@ -58,10 +58,15 @@ export const viewCart = async (req, res) => {
   const customerId = req.user.id;
 
   try {
-    const cart = await Cart.findOne({ customerId }).populate(
-      "items.productId",
-      "name price imageUrl"
-    );
+    const cart = await Cart.findOne({ customerId }).populate({
+      path: "items.productId",
+      select: "name price imageUrl seller", // include seller in first populate
+      populate: {
+        path: "seller",
+        model: "Seller", // match your model name
+        select: "username email imageUrl", // add whatever fields you want
+      },
+    });
 
     if (!cart || cart.items.length === 0) {
       return res.status(200).json({ message: "Cart is empty", cart: null });
