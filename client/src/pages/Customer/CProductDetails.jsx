@@ -1,29 +1,52 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Minus, Plus } from 'lucide-react';
+import React, { useState, useRef, useEffect } from "react";
+import { Minus, Plus } from "lucide-react";
 import Slider from "react-slick";
-import ActionButton from '../../components/Button/ActionButton';
-import { useLocation, useNavigate } from 'react-router-dom';
+import ActionButton from "../../components/Button/ActionButton";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const ProductPage = () => {
-    const {state} = useLocation(); 
-    const product = state?.product;
-   
+  const { state } = useLocation();
+  const product = state?.product;
+
   const [quantity, setQuantity] = useState(1);
+  const apiUrl = import.meta.env.VITE_ROUTE_URL;
+
   const mainSliderRef = useRef(null);
   const thumbnailSliderRef = useRef(null);
-  
+
   const images = [
-    '/api/placeholder/400/400',
-    '/api/placeholder/400/400',
-    '/api/placeholder/400/400'
-  ];
-  
+    "/api/placeholder/400/400",
+    "/api/placeholder/400/400",
+    "/api/placeholder/400/400",
+  ]; //should be minimum tree image
+
   const decreaseQuantity = () => {
     if (quantity > 1) setQuantity(quantity - 1);
   };
-  
+
   const increaseQuantity = () => {
     setQuantity(quantity + 1);
+  };
+
+  const handleAddToCart = async () => {
+    try {
+      const receivedValues = { productId: product._id, quantity: quantity };
+      await axios.post(`${apiUrl}/api/add-cart`, receivedValues, {
+        withCredentials: true,
+      });
+      toast.success("Product Added to Cart", {
+        position: "top-center",
+        autoClose: 1500,
+      });
+    } catch (error) {
+      console.log("Failed to add to cart:", error);
+      toast.error("Failed to add to Cart", {
+        position: "top-center",
+        autoClose: 1500,
+      });
+    }
   };
 
   // Settings for the main slider
@@ -37,7 +60,7 @@ const ProductPage = () => {
     fade: true,
     afterChange: (current) => {
       thumbnailSliderRef.current.slickGoTo(current);
-    }
+    },
   };
 
   // Settings for the thumbnail slider
@@ -55,9 +78,9 @@ const ProductPage = () => {
         breakpoint: 768,
         settings: {
           slidesToShow: 3,
-        }
-      }
-    ]
+        },
+      },
+    ],
   };
 
   return (
@@ -69,20 +92,20 @@ const ProductPage = () => {
             <Slider ref={mainSliderRef} {...mainSettings}>
               {product?.imageUrl.map((img, idx) => (
                 <div key={idx} className="outline-none">
-                  <img 
-                    src={img} 
-                    alt={`JBL Air R03 TWS Wireless Earbuds view ${idx + 1}`} 
+                  <img
+                    src={img}
+                    alt={`JBL Air R03 TWS Wireless Earbuds view ${idx + 1}`}
                     className="w-full h-auto"
                   />
                 </div>
               ))}
             </Slider>
           </div>
-          
+
           {/* Thumbnail Slider */}
           <div className="mt-4">
-            <Slider 
-              ref={thumbnailSliderRef} 
+            <Slider
+              ref={thumbnailSliderRef}
               {...thumbnailSettings}
               asNavFor={mainSliderRef.current}
               onInit={() => {
@@ -95,14 +118,14 @@ const ProductPage = () => {
             >
               {images.map((img, idx) => (
                 <div key={idx} className="px-1 outline-none">
-                  <div 
+                  <div
                     className="border h-16 cursor-pointer mx-1"
                     onClick={() => mainSliderRef.current.slickGoTo(idx)}
                   >
-                    <img 
-                      src={img} 
-                      alt={`Thumbnail ${idx + 1}`} 
-                      className="w-full h-full object-cover" 
+                    <img
+                      src={img}
+                      alt={`Thumbnail ${idx + 1}`}
+                      className="w-full h-full object-cover"
                     />
                   </div>
                 </div>
@@ -110,7 +133,7 @@ const ProductPage = () => {
             </Slider>
           </div>
         </div>
-        
+
         {/* Right side - Product Details */}
         <div className="w-full md:w-3/5">
           <div className="flex justify-between items-start">
@@ -118,28 +141,28 @@ const ProductPage = () => {
               {product?.name}
             </h1>
           </div>
-          
+
           {/* Ratings */}
           <div className="mt-2 flex items-center">
-            <div className="flex text-yellow-400">
-              {'★★★★★'}
-            </div>
+            <div className="flex text-yellow-400">{"★★★★★"}</div>
             <span className="ml-2 text-sm text-blue-600">Ratings 35</span>
           </div>
-          
+
           {/* Descripton */}
           <div className="mt-4 text-sm">
             <span className="text-gray-600">Descripton: </span>
             <span className="mx-2">{product?.description}</span>
           </div>
-          
+
           {/* Price */}
           <div className="mt-6">
             <div className="flex items-baseline">
-              <span className="text-3xl font-medium text-gray-900">Rs. {product?.price}</span>
+              <span className="text-3xl font-medium text-gray-900">
+                Rs. {product?.price}
+              </span>
             </div>
           </div>
-          
+
           {/* Available Quantity */}
           <div className="mt-4">
             <div className="flex items-center">
@@ -149,20 +172,20 @@ const ProductPage = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Quantity */}
           <div className="mt-6">
             <div className="flex items-center">
               <span className="text-gray-600 mr-4">Quantity:</span>
               <div className="flex items-center border rounded">
-                <button 
+                <button
                   className="px-3 py-1 border-r"
                   onClick={decreaseQuantity}
                 >
                   <Minus size={16} />
                 </button>
                 <span className="px-6 py-1">{quantity}</span>
-                <button 
+                <button
                   className="px-3 py-1 border-l"
                   onClick={increaseQuantity}
                 >
@@ -171,11 +194,11 @@ const ProductPage = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Buttons */}
           <div className="mt-6 flex gap-4">
             <ActionButton name={"Buy Now"} />
-            <ActionButton name={"Add to Cart"} />
+            <ActionButton onClick={handleAddToCart} name={"Add to Cart"} />
           </div>
         </div>
       </div>

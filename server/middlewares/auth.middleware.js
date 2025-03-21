@@ -12,11 +12,11 @@ export const auth = (req, res, next) => {
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
       const decode = jwt.verify(token, process.env.JWT_SECRET);
-      req.admin = decode;
+      req.user = decode;
 
       next();
     });
   } catch (error) {
-    res.status(400).json({ message: "Invalid or expired admin token" });
+    res.status(400).json({ message: "Invalid or expired user token" });
   }
 };

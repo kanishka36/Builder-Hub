@@ -35,12 +35,12 @@ const Navbar = () => {
           ) : (
             <Link to={'/sign-in'} className="text-gray-300 hover:text-white">Sign In</Link>
           )}
-          <div className="relative cursor-pointer">
+          <Link className="relative cursor-pointer" to={"/cart"}>
             <ShoppingCart className="text-primary" size={24} />
             <div className="absolute top-0 right-0 bg-primary text-black text-xs font-bold rounded-full px-1">
               2
             </div>
-          </div>
+          </Link>
         </div>
       </div>
     </nav>

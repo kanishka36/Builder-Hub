@@ -32,6 +32,7 @@ import Products from "./pages/Seller/Supply/Products";
 import AddProduct from "./pages/Seller/Supply/AddProducts"
 import EditProducts from "./pages/Seller/Supply/EditProducts";
 import CProductDetails from "./pages/Customer/CProductDetails";
+import CCart from "./pages/Customer/CCart";
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
           <Route path="/seller-profile/:sellerId" element={<CustomerLayout component={CSellerProfile} />} />
           <Route path="/add-review/:sellerId" element={<CustomerLayout component={AddReview} />} />
           <Route path="/shop/:supplierId" element={<CustomerLayout component={CShop} />} />
+          <Route path="/cart" element={<CustomerLayout component={CCart} />} />
         </Route>
         <Route path="/" element={<CustomerLayout component={Home} />} />
         <Route path="/services" element={<CustomerLayout component={CServices} />} />
