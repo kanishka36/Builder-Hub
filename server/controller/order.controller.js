@@ -12,15 +12,14 @@ export const createOrderFromCart = async (req, res) => {
       return res.status(400).json({ message: "Cart is empty" });
     }
 
-    const cartItem = cart.items[0]; // Since only one item at a time
-    const { productId, quantity } = cartItem;
+    const cartItem = cart.items[0]; // One item at a time
 
-    const product = await Product.findById(productId);
+    const product = await Product.findById(cartItem.productId);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    if (product.stock < quantity) {
+    if (product.stock < cartItem.quantity) {
       return res
         .status(400)
         .json({ success: false, message: "Insufficient product stock" });
@@ -28,17 +27,17 @@ export const createOrderFromCart = async (req, res) => {
 
     const newOrder = new Order({
       customerId,
+      seller: product.seller, // ✅ fixed: get seller from product
       items: [cartItem],
-      totalQuantity: quantity,
-      totalPrice: quantity * cartItem.priceAtTime,
+      totalQuantity: cartItem.quantity,
+      totalPrice: cartItem.quantity * cartItem.priceAtTime,
       paymentStatus: "Paid",
     });
 
-    product.stock -= quantity;
+    product.stock -= cartItem.quantity;
     await product.save();
     await newOrder.save();
 
-    // Clear cart after purchase
     cart.items = [];
     cart.totalQuantity = 0;
     cart.totalPrice = 0;
@@ -85,6 +84,7 @@ export const createOrderFromBuyNow = async (req, res) => {
 
     const newOrder = new Order({
       customerId,
+      seller: product.seller,
       items: [orderItem],
       totalQuantity,
       totalPrice,
@@ -134,9 +134,11 @@ export const viewSellerOrders = async (req, res) => {
   const sellerId = req.user.id;
 
   try {
-    const orders = await Order.find({ sellerId }).sort({ createdAt: -1 });
+    const orders = await Order.find({ seller: sellerId })
+      .sort({ createdAt: -1 })
+      .populate("items.productId");
 
-    if (!orders) {
+    if (!orders || orders.length === 0) {
       return res
         .status(404)
         .json({ message: "Order not found or unauthorized" });

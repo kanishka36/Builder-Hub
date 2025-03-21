@@ -23,6 +23,11 @@ const orderSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  seller: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Seller',
+    required: true
+  },
   items: [orderItemSchema],
   paymentStatus: {
     type: String,

@@ -11,5 +11,5 @@ export const orderRoutes = express.Router();
 
 orderRoutes.post("/add-order/buy-now", auth, createOrderFromBuyNow);
 orderRoutes.post("/add-order/from-cart", auth, createOrderFromCart);
-orderRoutes.get("/view-orders/user", viewUserOrders);
-orderRoutes.get("/view-orders/seller", viewSellerOrders);
+orderRoutes.get("/view-orders/user", auth, viewUserOrders);
+orderRoutes.get("/view-orders/seller", auth, viewSellerOrders);

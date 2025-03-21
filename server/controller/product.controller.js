@@ -50,7 +50,6 @@ export const addProduct = async (req, res) => {
 export const viewProduct = async (req, res) => {
   try {
     const { sellerId } = req.params;
-    console.log(sellerId);
     const products = await Product.find({ seller: sellerId })
       .populate("seller", "username imageUrl")
       .exec();

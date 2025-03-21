@@ -5,7 +5,7 @@ import Home from "./pages/Customer/Home";
 import AdminLayout from "./components/layouts/AdminLayout";
 import Dashboard from "./pages/Dashboard";
 import Services from "./pages/Seller/service/Services";
-import Orders from "./pages/Seller/Orders";
+import Orders from "./pages/Seller/Supply/Orders";
 import Register from "./pages/Auth/Register";
 import Login from "./pages/Auth/Login";
 import AuthLayout from "./components/layouts/AuthLayout";

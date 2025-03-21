@@ -52,7 +52,10 @@ const CCart = () => {
         try {
           const res = await axios.post(
             `${apiUrl}/api/add-order/from-cart`,
-            { productId: selectedItem, quantity: selectedItem.quantity },
+            {
+              productId: selectedItem,
+              quantity: selectedItem.quantity,
+            },
             { withCredentials: true }
           );
           if (res.data.success === true) {
