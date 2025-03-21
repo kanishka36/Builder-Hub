@@ -95,7 +95,7 @@ const CServiceDetails = () => {
           );
 
           if (res.data.success) {
-            toast.success("Booking confirmed after payment!", {
+            toast.success("Booking confirmed!", {
               position: "top-center",
               autoClose: 1500,
             });
@@ -123,7 +123,6 @@ const CServiceDetails = () => {
       },
     });
   };
-  
 
   const isDateBooked = (date) => {
     const formattedDate = date.toISOString().split("T")[0]; // Convert to YYYY-MM-DD

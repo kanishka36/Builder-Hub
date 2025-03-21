@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchCartItems, removeCartItem } from "../../redux/user/cartSlice";
 import { Heart, Trash2 } from "lucide-react";
 import axios from "axios";
+import { toast } from "react-toastify";
 import Card from "../../components/UI/Card";
 import ActionButton from "../../components/Button/ActionButton";
 import { handlePayment } from "../../utils/paymentUtils";
@@ -38,7 +39,7 @@ const CCart = () => {
     }
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     console.log(selectedItem, "selected item");
     handlePayment({
       type: "product",
@@ -46,12 +47,41 @@ const CCart = () => {
       amount: selectedItem.productId.price * selectedItem.quantity,
       customer: currentUser,
       sellerId: selectedItem.productId.seller._id,
-      onSuccess: (orderId) => {
+      onSuccess: async (orderId) => {
         console.log("Product payment success!", orderId);
-        // Save product order logi here
+        try {
+          const res = await axios.post(
+            `${apiUrl}/api/add-order/from-cart`,
+            { productId: selectedItem, quantity: selectedItem.quantity },
+            { withCredentials: true }
+          );
+          if (res.data.success === true) {
+            dispatch(fetchCartItems());
+            setSelectedItem(null);
+            toast.success("Order confirmed!", {
+              position: "top-center",
+              autoClose: 1500,
+            });
+          }
+        } catch (error) {
+          console.log(error);
+          toast.error("Order failed to update after payment.", {
+            position: "top-center",
+            autoClose: 1500,
+          });
+        }
+      },
+      onDismiss: () => {
+        toast.error("Payment was cancelled.", {
+          position: "top-center",
+          autoClose: 1500,
+        });
       },
       onError: (err) => {
-        console.log("Product payment failed!", err);
+        toast.error("Payment failed. Try again.", {
+          position: "top-center",
+          autoClose: 1500,
+        });
       },
     });
   };

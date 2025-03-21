@@ -58,23 +58,49 @@ const ProductPage = () => {
   };
 
   //payment
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     handlePayment({
       type: "product",
       itemTitle: product.name,
       amount: product.price * quantity,
       customer: currentUser,
       sellerId: product.seller._id,
-      onSuccess: (orderId) => {
+      onSuccess: async (orderId) => {
         console.log("Product payment success!", orderId);
-        // Save product order logi here
+        try {
+          const res = await axios.post(
+            `${apiUrl}/api/add-order/buy-now`,
+            { productId: product, quantity: quantity },
+            { withCredentials: true }
+          );
+          if (res.data.success === true) {
+            toast.success("Order confirmed!", {
+              position: "top-center",
+              autoClose: 1500,
+            });
+          }
+        } catch (error) {
+          console.log(error);
+          toast.error("Order failed to update after payment.", {
+            position: "top-center",
+            autoClose: 1500,
+          });
+        }
+      },
+      onDismiss: () => {
+        toast.error("Payment was cancelled.", {
+          position: "top-center",
+          autoClose: 1500,
+        });
       },
       onError: (err) => {
-        console.log("Product payment failed!", err);
+        toast.error("Payment failed. Try again.", {
+          position: "top-center",
+          autoClose: 1500,
+        });
       },
     });
-    
-  }
+  };
 
   // Settings for the main slider
   const mainSettings = {

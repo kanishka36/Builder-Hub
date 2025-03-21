@@ -19,6 +19,7 @@ import Chat from "./model/chat.model.js";
 import { reviewRoutes } from "./routes/review.routes.js";
 import { productRoutes } from "./routes/product.routes.js";
 import { cartRoutes } from "./routes/cart.routes.js";
+import { orderRoutes } from "./routes/order.routes.js";
 
 dotenv.config();
 
@@ -138,9 +139,10 @@ app.use("/api", roleRoutes);
 app.use("/api", sellerRoutes);
 app.use("/api", bookingRoutes);
 app.use("/api", userRoutes);
-app.use("/api", reviewRoutes)
-app.use("/api", productRoutes)
-app.use("/api", cartRoutes)
+app.use("/api", reviewRoutes);
+app.use("/api", productRoutes);
+app.use("/api", cartRoutes);
+app.use("/api", orderRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello Kanishka");
