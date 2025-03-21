@@ -5,26 +5,26 @@ import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import LoadingPage from "../../components/UI/LoadingPage";
 
-const ProductCard = ({ supplier }) => {
+const ProductCard = ({ product }) => {
   const [reviews, setReviews] = useState([]);
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
 
   const fetchReview = async () => {
     try {
-      const res = await axios.get(`${apiUrl}/api/view-review/${supplier._id}`, {
+      const res = await axios.get(`${apiUrl}/api/view-review/${product._id}`, {
         withCredentials: true,
       });
-      setReviews(res.data.data);
+      setReviews(res.data.data || []);
     } catch (error) {
       console.log("Failed to fetch reviews:", error);
     }
   };
 
   useEffect(() => {
-    if (supplier?._id) {
+    if (product?._id) {
       fetchReview();
     }
-  }, [supplier?._id]);
+  }, [product?._id]);
 
   const calculateAverageRating = (reviews) => {
     if (!reviews.length) return 0;
@@ -37,11 +37,12 @@ const ProductCard = ({ supplier }) => {
 
   return (
     <Card className="rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+      {/* Product Image */}
       <div className="w-full h-44 bg-gray-200 flex items-center justify-center">
-        {supplier.imageUrl ? (
+        {product?.imageUrl ? (
           <img
-            src={supplier.imageUrl}
-            alt={supplier.title}
+            src={product.imageUrl}
+            alt={product?.name || "Product Image"}
             className="w-full h-full object-cover"
           />
         ) : (
@@ -49,26 +50,33 @@ const ProductCard = ({ supplier }) => {
         )}
       </div>
 
+      {/* Product Details */}
       <div className="p-4">
-        <h2 className="text-lg font-semibold truncate">
-          {supplier.role?.name}
-        </h2>
-        <p className="text-sm text-gray-600">{supplier.seller?.username}</p>
+        <h2 className="text-lg font-semibold truncate">{product?.name || "Unnamed Product"}</h2>
+        <p className="text-sm text-gray-600">{product?.description || "No description available."}</p>
 
-        <div className="flex items-center mt-2">
+        {/* Price & Quantity */}
+        <p className="text-sm text-gray-800 font-medium mt-1">
+          <span className="text-gray-600">Price:</span> ${product?.price || "0.00"}
+        </p>
+        <p className="text-sm text-gray-800 font-medium">
+          <span className="text-gray-600">Quantity:</span> {product?.quantity || "0"}
+        </p>
+
+        {/* Ratings & Reviews */}
+        <div className="flex items-center mt-3">
           <Star className="text-yellow-500 w-4 h-4" />
-          <span className="ml-1 font-semibold">{rating || "0.0"}</span>
-          <span className="text-gray-500 ml-2">
-            ({reviewCount || "0"} Reviews)
-          </span>
+          <span className="ml-1 font-semibold">{rating}</span>
+          <span className="text-gray-500 ml-2">({reviewCount} Reviews)</span>
         </div>
+        
       </div>
     </Card>
   );
 };
 
 const CShop = () => {
-  const [suppliers, setSuppliers] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
   const { supplierId } = useParams();
@@ -78,7 +86,7 @@ const CShop = () => {
       const res = await axios.get(`${apiUrl}/api/view-products/${supplierId}`, {
         withCredentials: true,
       });
-      setSuppliers(res.data.data);
+      setProducts(res.data.data);
     } catch (error) {
       console.log("Failed to fetch product:", error);
     } finally {
@@ -97,9 +105,9 @@ const CShop = () => {
   return (
     <div className="container mx-auto p-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {suppliers.map((supplier) => (
-          <Link key={supplier._id} to={`/shop/${supplier._id}`}>
-            <ProductCard supplier={supplier} />
+        {products.map((product) => (
+          <Link key={product._id} to={`/product/${product._id}`} state={{product}}>
+            <ProductCard product={product} />
           </Link>
         ))}
       </div>

@@ -31,6 +31,7 @@ import CShop from "./pages/Customer/CShop";
 import Products from "./pages/Seller/Supply/Products";
 import AddProduct from "./pages/Seller/Supply/AddProducts"
 import EditProducts from "./pages/Seller/Supply/EditProducts";
+import CProductDetails from "./pages/Customer/CProductDetails";
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
         {/* customer  */}
         <Route element={<CustomerPrivateRoutes />}>
           <Route path="/services/:serviceId" element={<CustomerLayout component={CServiceDetails} />} /> 
+          <Route path="/product/:productId" element={<CustomerLayout component={CProductDetails} />} /> 
           <Route path="/user/profile" element={<CustomerLayout component={CProfile} />} /> 
           <Route path="/seller-profile/:sellerId" element={<CustomerLayout component={CSellerProfile} />} />
           <Route path="/add-review/:sellerId" element={<CustomerLayout component={AddReview} />} />
