@@ -18,6 +18,7 @@ import { createServer } from "http";
 import Chat from "./model/chat.model.js";
 import { reviewRoutes } from "./routes/review.routes.js";
 import { productRoutes } from "./routes/product.routes.js";
+import { cartRoutes } from "./routes/cart.routes.js";
 
 dotenv.config();
 
@@ -139,6 +140,7 @@ app.use("/api", bookingRoutes);
 app.use("/api", userRoutes);
 app.use("/api", reviewRoutes)
 app.use("/api", productRoutes)
+app.use("/api", cartRoutes)
 
 app.get("/", (req, res) => {
   res.send("Hello Kanishka");

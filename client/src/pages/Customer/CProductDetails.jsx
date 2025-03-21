@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Heart, Share2, Minus, Plus } from 'lucide-react';
+import { Minus, Plus } from 'lucide-react';
 import Slider from "react-slick";
 import ActionButton from '../../components/Button/ActionButton';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -143,7 +143,7 @@ const ProductPage = () => {
           {/* Available Quantity */}
           <div className="mt-4">
             <div className="flex items-center">
-              <span className="text-gray-600 mr-4">Available Quantity</span>
+              <span className="text-gray-600 mr-4">Available Quantity:</span>
               <div className=" text-black px-2 text-sm flex items-center">
                 {product?.quantity}
               </div>
@@ -153,7 +153,7 @@ const ProductPage = () => {
           {/* Quantity */}
           <div className="mt-6">
             <div className="flex items-center">
-              <span className="text-gray-600 mr-4">Quantity</span>
+              <span className="text-gray-600 mr-4">Quantity:</span>
               <div className="flex items-center border rounded">
                 <button 
                   className="px-3 py-1 border-r"
