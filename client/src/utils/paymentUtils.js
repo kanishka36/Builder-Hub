@@ -1,33 +1,35 @@
-// utils/paymentUtils.js
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 
 export const handlePayment = async ({
-  selectedItem,
-  totalPrice,
-  sellerId,
+  type = "default", // for logging or future customizations
+  itemTitle,
+  amount,
   customer,
+  sellerId,
+  customData = {},
+  onSuccess,
+  onError,
+  onDismiss,
 }) => {
-  if (!selectedItem || !customer) {
-    console.error("Missing selectedItem or customer info");
+  if (!customer || !itemTitle || !amount || !sellerId) {
+    console.error("Missing payment data");
     return;
   }
-  const customerId = customer?._id;
-  const apiUrl = import.meta.env.VITE_ROUTE_URL;
-  const orderId = `PRODUCT_${uuidv4()}`;
-  const merchantID = import.meta.env.VITE_PAYHERE_MERCHANT_ID;
 
-  console.log(customer, "customer");
+  const orderId = `${type.toUpperCase()}_${uuidv4()}`;
+  const apiUrl = import.meta.env.VITE_ROUTE_URL;
+  const merchantID = import.meta.env.VITE_PAYHERE_MERCHANT_ID;
 
   const payment = {
     sandbox: true,
     merchant_id: merchantID,
     return_url: "http://localhost:5173/payment-success",
     cancel_url: "http://localhost:5173/payment-failed",
-    notify_url: `http://localhost:5173/notify`,
+    notify_url: "http://localhost:5173/notify",
     order_id: orderId,
-    items: selectedItem.name,
-    amount: totalPrice,
+    items: itemTitle,
+    amount: amount,
     currency: "LKR",
     first_name: customer.firstName,
     last_name: customer.lastName,
@@ -40,7 +42,8 @@ export const handlePayment = async ({
     delivery_city: customer.city,
     delivery_country: "Sri Lanka",
     custom_1: sellerId,
-    custom_2: customerId,
+    custom_2: customer._id,
+    ...customData, // optional additional fields
   };
 
   try {
@@ -52,8 +55,26 @@ export const handlePayment = async ({
     });
 
     payment.hash = response.data.hash;
+
+    // Setup PayHere callbacks
+    payhere.onCompleted = function (orderId) {
+      console.log("✅ Payment completed:", orderId);
+      onSuccess?.(orderId);
+    };
+
+    payhere.onDismissed = function () {
+      console.warn("⚠️ Payment dismissed by user");
+      onDismiss?.();
+    };
+
+    payhere.onError = function (error) {
+      console.error("❌ Payment error:", error);
+      onError?.(error);
+    };
+
     payhere.startPayment(payment);
-  } catch (error) {
-    console.error("Error generating hash or starting payment:", error);
+  } catch (err) {
+    console.error("Hash generation failed:", err);
+    onError?.(err);
   }
 };

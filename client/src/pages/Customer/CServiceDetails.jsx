@@ -6,24 +6,10 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
-import { v4 as uuidv4 } from "uuid";
 import Chat from "../../components/Chat";
-import { X } from "lucide-react";
+import { handlePayment } from "../../utils/paymentUtils";
 
 const CServiceDetails = () => {
-  const review1 = {
-    username: "Johnolszew",
-    country: "Canada",
-    rating: 5,
-    timeAgo: "1 week ago",
-    comment:
-      "Like most people, I was initially skeptical since this was my first Fiverr experience. However, after working with Luna, I am now fully confident in the platform. I had no clear idea of what I wanted for our company logo, but she came up with an incredibly creative design. It turned out simpler than...",
-    price: "$50",
-    duration: "2 days",
-    sellerResponse:
-      "Thank you for your kind words! It was a pleasure working on your project.",
-  };
-
   const [service, setService] = useState({});
   const { serviceId } = useParams();
   const [bookedDates, setBookedDates] = useState([]);
@@ -88,113 +74,56 @@ const CServiceDetails = () => {
   };
 
   const handleBookDate = async () => {
-    if (selectedDates.length === 0) {
-      toast.error("Please select at least one date before booking.", {
-        position: "top-center",
-        autoClose: 1500,
-      });
-      return;
-    }
+    handlePayment({
+      type: "booking",
+      itemTitle: service.title,
+      amount: service.price * selectedDates.length,
+      customer: currentUser,
+      sellerId,
+      onSuccess: async (orderId) => {
+        try {
+          const res = await axios.post(
+            `${apiUrl}/api/book`,
+            {
+              sellerId,
+              customerId: currentUser._id,
+              serviceId,
+              date: selectedDates,
+              transactionId: orderId,
+            },
+            { withCredentials: true }
+          );
 
-    // Generate Order ID
-    const orderId = `BOOKING_${uuidv4()}`;
-    const merchantID = import.meta.env.VITE_PAYHERE_MERCHANT_ID;
-    const totalPrice = service.price * selectedDates.length;
-
-    // Define payment details
-    const payment = {
-      sandbox: true,
-      merchant_id: merchantID,
-      return_url: "http://localhost:5173/payment-success",
-      cancel_url: "http://localhost:5173/payment-failed",
-      // notify_url: `${apiUrl}/api/payment-webhook`,
-      notify_url: `http://localhost:5173/notify`,
-      order_id: orderId,
-      items: service.title,
-      amount: totalPrice,
-      currency: "LKR",
-      first_name: currentUser.firstName,
-      last_name: currentUser.lastName,
-      email: currentUser.email,
-      phone: currentUser.phoneNumber,
-      address: currentUser.address,
-      city: currentUser.city,
-      country: "Sri Lanka",
-      delivery_address: currentUser.address,
-      delivery_city: currentUser.city,
-      delivery_country: "Sri Lanka",
-      custom_1: sellerId,
-      custom_2: customerId,
-    };
-
-    try {
-      const response = await axios.post(`${apiUrl}/api/generate-hash`, {
-        merchant_id: payment.merchant_id,
-        order_id: payment.order_id,
-        amount: payment.amount,
-        currency: payment.currency,
-      });
-
-      payment.hash = response.data.hash;
-      payhere.startPayment(payment);
-    } catch (error) {
-      console.error("Error generating hash:", error);
-    }
-  };
-
-  useEffect(() => {
-    payhere.onCompleted = async function (orderId) {
-      console.log("Payment completed. Order ID:", orderId);
-
-      try {
-        const res = await axios.post(
-          `${apiUrl}/api/book`,
-          {
-            sellerId: sellerId,
-            customerId: customerId,
-            serviceId: serviceId,
-            date: selectedDates,
-            transactionId: orderId, // Store transaction ID
-          },
-          { withCredentials: true }
-        );
-
-        if (res.data.success) {
-          toast.success("Booking confirmed after payment!", {
+          if (res.data.success) {
+            toast.success("Booking confirmed after payment!", {
+              position: "top-center",
+              autoClose: 1500,
+            });
+            setBookedDates([...bookedDates, ...selectedDates]);
+            setSelectedDates([]);
+          }
+        } catch (error) {
+          toast.error("Booking failed to update after payment.", {
             position: "top-center",
             autoClose: 1500,
           });
-
-          // Update state
-          setBookedDates([...bookedDates, ...selectedDates]);
-          setSelectedDates([]);
         }
-      } catch (error) {
-        console.error("Booking update failed:", error);
-        toast.error("Booking confirmation failed!", {
+      },
+      onDismiss: () => {
+        toast.error("Payment was cancelled.", {
           position: "top-center",
           autoClose: 1500,
         });
-      }
-    };
-
-    // PayHere Payment Dismissed Callback
-    payhere.onDismissed = function () {
-      toast.error("Payment process was canceled.", {
-        position: "top-center",
-        autoClose: 1500,
-      });
-    };
-
-    // PayHere Payment Error Callback
-    payhere.onError = function (error) {
-      console.error("Payment error:", error);
-      toast.error("Payment failed. Please try again.", {
-        position: "top-center",
-        autoClose: 1500,
-      });
-    };
-  }, [sellerId, selectedDates]);
+      },
+      onError: (err) => {
+        toast.error("Payment failed. Try again.", {
+          position: "top-center",
+          autoClose: 1500,
+        });
+      },
+    });
+  };
+  
 
   const isDateBooked = (date) => {
     const formattedDate = date.toISOString().split("T")[0]; // Convert to YYYY-MM-DD
@@ -254,9 +183,7 @@ const CServiceDetails = () => {
         </Card>
         <Card className="mt-6">
           <div className="text-lg font-bold mb-4">Reviews</div>
-          <ReviewBox
-            serviceId={serviceId}
-          />
+          <ReviewBox serviceId={serviceId} />
         </Card>
       </div>
       <div className="flex-2 relative">

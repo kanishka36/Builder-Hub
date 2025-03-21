@@ -59,17 +59,21 @@ const ProductPage = () => {
 
   //payment
   const handleCheckout = () => {
-    const selectedItem = product;
-    const sellerId = product.seller?._id;
-    const totalPrice = product?.price * quantity;
-    const customer = currentUser;
-
     handlePayment({
-      selectedItem,
-      sellerId,
-      totalPrice,
-      customer
-    })
+      type: "product",
+      itemTitle: product.name,
+      amount: product.price * quantity,
+      customer: currentUser,
+      sellerId: product.seller._id,
+      onSuccess: (orderId) => {
+        console.log("Product payment success!", orderId);
+        // Save product order logi here
+      },
+      onError: (err) => {
+        console.log("Product payment failed!", err);
+      },
+    });
+    
   }
 
   // Settings for the main slider
