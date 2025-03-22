@@ -6,12 +6,12 @@ import { useSelector } from "react-redux";
 import ActionButton from "../../../components/Button/ActionButton";
 import { toast } from "react-toastify";
 import AddReview from "../../../components/AddReview";
+import COrderDetails from "./COrderDetails";
 
 const COrderManage = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [orders, setOrders] = useState([]);
-  const [review, setReview] = useState(null);
-  const [selectedOrders, setSelectedOrders] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
 
@@ -26,25 +26,15 @@ const COrderManage = () => {
     }
   };
 
-  const fetchReviewedOrderss = async () => {
-    try {
-      const res = await axios.get(`${apiUrl}/api/view-user-review/${userId}`, {
-        withCredentials: true,
-      });
-      console.log(res);
-      setReview(res.data.data);
-    } catch (error) {
-      console.log("Failed to fetch orderss:", error);
-    }
-  };
-
-  console.log(review, "reviews");
   console.log(orders, "orders");
 
   useEffect(() => {
     fetchOrders();
-    fetchReviewedOrderss();
   }, []);
+
+  const handlePassData = (order) => {
+    setSelectedOrder(order);
+  };
 
   const columns = [
     { header: "ID", accessor: "orderId" },
@@ -84,7 +74,7 @@ const COrderManage = () => {
       header: "Total",
       render: (row) => (
         <div>
-          <ActionButton name={"Manage"} />
+          <ActionButton name={"Manage"} onClick={() => handlePassData(row)} />
         </div>
       ),
     },
@@ -92,13 +82,26 @@ const COrderManage = () => {
 
   return (
     <div className="relative">
-      {selectedOrders !== null && (
+      {selectedOrder !== null && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"></div>
       )}
       <h1 className="text-2xl font-medium text-gray-800 mb-6">My Orderss</h1>
       <div>
         <Table columns={columns} data={orders} />
       </div>
+      {selectedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="bg-white max-w-3xl w-full rounded-lg shadow-lg relative overflow-y-auto max-h-[90vh]">
+            <COrderDetails
+              order={selectedOrder}
+              onClose={() => {
+                setSelectedOrder(null);
+                fetchOrders();
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

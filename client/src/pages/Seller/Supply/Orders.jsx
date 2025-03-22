@@ -30,10 +30,6 @@ const Orders = () => {
     setSelectedOrder(order);
   };
 
-  const handleClose = () => {
-    setSelectedOrder(null);
-  };
-
   const columns = [
     {
       header: "Order ID",
@@ -87,7 +83,10 @@ const Orders = () => {
           <div className="bg-white max-w-3xl w-full rounded-lg shadow-lg relative overflow-y-auto max-h-[90vh]">
             <OrderDetails
               order={selectedOrder}
-              onClose={() => {setSelectedOrder(null); fetchOrders()}}
+              onClose={() => {
+                setSelectedOrder(null);
+                fetchOrders();
+              }}
             />
           </div>
         </div>
