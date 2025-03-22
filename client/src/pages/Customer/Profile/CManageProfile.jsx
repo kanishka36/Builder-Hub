@@ -15,6 +15,7 @@ const CManageProfile = () => {
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
   const { currentUser } = useSelector((state) => state.user);
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditing2, setIsEditing2] = useState(false);
   const dispatch = useDispatch();
 
   const initialValues = {
@@ -28,6 +29,13 @@ const CManageProfile = () => {
     phoneNumber: currentUser?.phoneNumber || "",
   };
 
+  // initial values for billing address
+  const initialValues2 = {
+    billingAddress: currentUser?.billingAddress || "",
+    billingCity: currentUser?.billingCity || "",
+    billingPhoneNumber: currentUser?.billingPhoneNumber || "",
+  };
+
   const validationSchema = Yup.object().shape({
     username: Yup.string().required("Username is required"),
     firstName: Yup.string().required("First Name is required"),
@@ -36,6 +44,14 @@ const CManageProfile = () => {
     address: Yup.string().required("Address is required"),
     city: Yup.string().required("City is required"),
     phoneNumber: Yup.string()
+      .matches(/^\d{10}$/, "Phone number must be 10 digits")
+      .notRequired(),
+  });
+
+  const validationSchema2 = Yup.object().shape({
+    billingAddress: Yup.string().required("Address is required"),
+    billingCity: Yup.string().required("City is required"),
+    billingPhoneNumber: Yup.string()
       .matches(/^\d{10}$/, "Phone number must be 10 digits")
       .notRequired(),
   });
@@ -75,6 +91,37 @@ const CManageProfile = () => {
       });
     }
   };
+  // Handle BillingAddress form submission
+  const handleBillingAddressSubmit = async (values) => {
+    console.log("Updated Profile Data:", values);
+
+    try {
+      const res = await axios.put(
+        `${apiUrl}/api/edit-billing-address/${currentUser?._id}`,
+        {
+          billingAddress: values.billingAddress,
+          billingCity: values.billingCity,
+          billingPhoneNumber: values.billingPhoneNumber,
+        },
+        { withCredentials: true }
+      );
+      const data = res.data.data;
+      dispatch(updateUserSuccess(data));
+      setIsEditing(false);
+      console.log(data, "Updated Billing Address data");
+      toast.success("Updated Billing Address successfully", {
+        position: "top-center",
+        autoClose: 1500,
+      });
+    } catch (error) {
+      console.log("Failed to update Billing Address:", error);
+      toast.error("Failed to update Billing Address", {
+        position: "top-center",
+        autoClose: 1500,
+      });
+    }
+  };
+
   return (
     <>
       <div className="">
@@ -83,98 +130,160 @@ const CManageProfile = () => {
         </h1>
 
         {/* Personal Profile Card */}
-        <div className="mb-3 min-h-64">
-          <Card className={`${isEditing ? "absolute w-1/2" : ""}`}>
-            <div className="flex gap-3">
-              <div className="text-xl font-semibold">Personal Profile</div>
-              <div className="">
-                <ActionButton
-                  className="ml-auto"
-                  name={isEditing ? "Cancel" : "Edit"}
-                  onClick={() => setIsEditing(!isEditing)}
-                />
-              </div>
-            </div>
-            <div className="flex">
-              {isEditing ? (
-                <Formik
-                  initialValues={initialValues}
-                  validationSchema={validationSchema}
-                  onSubmit={handleSubmit}
-                >
-                  {({ setFieldValue, isSubmitting }) => (
-                    <Form className="space-y-2">
-                      <div>
-                        <FileUpload
-                          name="images"
-                          label={"Uploade Profile Picture"}
-                          onUploadComplete={(uploadedURLs) => {
-                            console.log("Uploaded URLs:", uploadedURLs); // Debugging
-                            setFieldValue("images", uploadedURLs);
-                          }}
-                          multiple={false}
-                        />
-                      </div>
-
-                      <TextField name={"username"} label={"Username"} />
-                      <div className="flex gap-2">
-                        <TextField name={"firstName"} label={"First Name"} />
-                        <TextField name={"lastName"} label={"Last Name"} />
-                      </div>
-                      <TextField name={"email"} label={"Email"} />
-                      <TextField name={"address"} label={"Address"} />
-                      <TextField name={"city"} label={"City"} />
-                      <TextField name={"phoneNumber"} label={"Phone Number"} />
-
-                      <div className="flex space-x-4">
-                        <SubmitButton name={"Save"} />
-                        <ActionButton
-                          name="Cancel"
-                          onClick={() => setIsEditing(false)}
-                        />
-                      </div>
-                    </Form>
-                  )}
-                </Formik>
-              ) : (
-                <div>
-                  <div className="">
-                    {!isEditing && (
-                      <div className="w-20 h-20 bg-gray-300 rounded-full overflow-hidden">
-                        {currentUser?.imageUrl ? (
-                          <img
-                            src={currentUser.imageUrl}
-                            alt="Profile"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <span className="text-sm text-gray-500 flex items-center justify-center h-full">
-                            No Image
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  <div className="text-lg font-medium">
-                    {currentUser?.username}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {currentUser?.email}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {currentUser?.address || "N/A"}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {currentUser?.phoneNumber || "N/A"}
-                  </div>
+        <div className="flex gap-3 justify-between">
+          <div className="flex-1 mb-3 min-h-64">
+            <Card className={`${isEditing ? "absolute w-1/2" : ""}`}>
+              <div className="flex gap-3">
+                <div className="text-xl font-semibold">Personal Profile</div>
+                <div className="">
+                  <ActionButton
+                    className="ml-auto"
+                    name={isEditing ? "Cancel" : "Edit"}
+                    onClick={() => setIsEditing(!isEditing)}
+                  />
                 </div>
-              )}
-            </div>
-          </Card>
+              </div>
+              <div className="flex">
+                {isEditing ? (
+                  <Formik
+                    initialValues={initialValues}
+                    validationSchema={validationSchema}
+                    onSubmit={handleSubmit}
+                  >
+                    {({ setFieldValue, isSubmitting }) => (
+                      <Form className="space-y-2">
+                        <div>
+                          <FileUpload
+                            name="images"
+                            label={"Uploade Profile Picture"}
+                            onUploadComplete={(uploadedURLs) => {
+                              console.log("Uploaded URLs:", uploadedURLs); // Debugging
+                              setFieldValue("images", uploadedURLs);
+                            }}
+                            multiple={false}
+                          />
+                        </div>
+
+                        <TextField name={"username"} label={"Username"} />
+                        <div className="flex gap-2">
+                          <TextField name={"firstName"} label={"First Name"} />
+                          <TextField name={"lastName"} label={"Last Name"} />
+                        </div>
+                        <TextField name={"email"} label={"Email"} />
+                        <TextField name={"address"} label={"Address"} />
+                        <TextField name={"city"} label={"City"} />
+                        <TextField
+                          name={"phoneNumber"}
+                          label={"Phone Number"}
+                        />
+
+                        <div className="flex space-x-4">
+                          <SubmitButton name={"Save"} />
+                          <ActionButton
+                            name="Cancel"
+                            onClick={() => setIsEditing(false)}
+                          />
+                        </div>
+                      </Form>
+                    )}
+                  </Formik>
+                ) : (
+                  <div>
+                    <div className="">
+                      {!isEditing && (
+                        <div className="w-20 h-20 bg-gray-300 rounded-full overflow-hidden">
+                          {currentUser?.imageUrl ? (
+                            <img
+                              src={currentUser.imageUrl}
+                              alt="Profile"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-sm text-gray-500 flex items-center justify-center h-full">
+                              No Image
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-lg font-medium">
+                      {currentUser?.username}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {currentUser?.email}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {currentUser?.address || "N/A"}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {currentUser?.phoneNumber || "N/A"}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Card>
+          </div>
+          <div className="flex-1 mb-3 min-h-64">
+            <Card className={`${isEditing2 ? "absolute w-1/2" : ""}`}>
+              <div className="flex gap-3">
+                <div className="text-xl font-semibold">Billing Address</div>
+                <div className="">
+                  <ActionButton
+                    className="ml-auto"
+                    name={isEditing2 ? "Cancel" : "Edit"}
+                    onClick={() => setIsEditing2(!isEditing2)}
+                  />
+                </div>
+              </div>
+              <div className="flex">
+                {isEditing2 ? (
+                  <Formik
+                    initialValues={initialValues2}
+                    validationSchema={validationSchema2}
+                    onSubmit={handleBillingAddressSubmit}
+                  >
+                    {({ setFieldValue, isSubmitting }) => (
+                      <Form className="space-y-2">
+                        <TextField name={"billingAddress"} label={"Address"} />
+                        <TextField name={"billingCity"} label={"City"} />
+                        <TextField
+                          name={"billingPhoneNumber"}
+                          label={"Phone Number"}
+                        />
+
+                        <div className="flex space-x-4">
+                          <SubmitButton name={"Save"} />
+                          <ActionButton
+                            name="Cancel"
+                            onClick={() => setIsEditing2(false)}
+                          />
+                        </div>
+                      </Form>
+                    )}
+                  </Formik>
+                ) : (
+                  <div>
+                    <div className="text-sm text-gray-600">
+                      {currentUser?.firstName + " " + currentUser?.lastName}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {currentUser?.billingAddress}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {currentUser?.billingCity || "N/A"}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {currentUser?.billingPhoneNumber || "N/A"}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Card>
+          </div>
         </div>
 
         {/* Recent Orders */}
-        <Card className="p-6">
+        <Card className="p-6 mb-3">
           <h2 className="text-lg font-medium text-gray-800 mb-4">
             Recent Orders
           </h2>

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Table from "../../../components/UI/Table";
 import ActionButton from "../../../components/Button/ActionButton";
-import EditButton from "../../../components/Button/EditButton";
-import DeleteButton from "../../../components/Button/DeleteButton";
 import axios from "axios";
+import OrderDetails from "./OrderDetails";
+import { X } from "lucide-react"; // Close icon (optional, or use any)
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
 
@@ -15,10 +16,9 @@ const Orders = () => {
       const res = await axios.get(`${apiUrl}/api/view-orders/seller`, {
         withCredentials: true,
       });
-      const data = res.data.data;
-      setOrders(data);
+      setOrders(res.data.data);
     } catch (error) {
-      console.log("failed to fetch orders of seller", error);
+      console.log("Failed to fetch orders of seller", error);
     }
   };
 
@@ -26,59 +26,72 @@ const Orders = () => {
     fetchOrders();
   }, []);
 
+  const handlePassData = (order) => {
+    setSelectedOrder(order);
+  };
+
+  const handleClose = () => {
+    setSelectedOrder(null);
+  };
+
   const columns = [
     {
+      header: "Order ID",
+      render: (row) => <div>{row.orderId || "N/A"}</div>,
+    },
+    {
+      header: "Date",
+      render: (row) => (
+        <div>{new Date(row.createdAt).toLocaleDateString()}</div>
+      ),
+    },
+    {
       header: "Product Name",
-      render: (row) => (
-        <div>
-          {row.items?.[0]?.productId?.name || "N/A"}
-        </div>
-      ),
-    },
-    {
-      header: "Quantity",
-      render: (row) => (
-        <div>{row.items?.[0]?.quantity}</div>
-      ),
-    },
-    {
-      header: "Total Price",
-      render: (row) => (
-        <div>${row.totalPrice.toFixed(2)}</div>
-      ),
+      render: (row) => <div>{row.items?.[0]?.productId?.name || "N/A"}</div>,
     },
     {
       header: "Order Status",
-      render: (row) => (
-        <div>{row.orderStatus}</div>
-      ),
+      render: (row) => <div>{row.orderStatus}</div>,
+    },
+    {
+      header: "Total Price",
+      render: (row) => <div>LKR {row.totalPrice.toFixed(2)}</div>,
     },
     {
       header: "Payment Status",
-      render: (row) => (
-        <div>{row.paymentStatus}</div>
-      ),
+      render: (row) => <div>{row.paymentStatus}</div>,
     },
     {
       header: "Action",
       render: (row) => (
         <div className="flex items-center space-x-4">
-          <EditButton />
-          <DeleteButton />
+          <ActionButton name="View" onClick={() => handlePassData(row)} />
         </div>
       ),
     },
   ];
-  
+
   return (
-    <div className="">
+    <div className="relative">
+      {selectedOrder !== null && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"></div>
+      )}
       <h2 className="text-2xl font-semibold mb-6">Order Management</h2>
-      <div className="">
-        <div className="flex justify-end mb-6">
-          <ActionButton name={"+ Add New Service"} />
-        </div>
+
+      <div className="mb-8">
         <Table columns={columns} data={orders} />
       </div>
+
+      {selectedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="bg-white max-w-3xl w-full rounded-lg shadow-lg relative overflow-y-auto max-h-[90vh]">
+            <OrderDetails
+              order={selectedOrder}
+              onClose={() => {setSelectedOrder(null); fetchOrders()}}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

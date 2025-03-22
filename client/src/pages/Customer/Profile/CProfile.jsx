@@ -7,9 +7,9 @@ import CBookings from "./CBookings";
 
 const CProfile = () => {
   const { currentUser } = useSelector((state) => state.user);
-  
+
   // State to track the active section
-  const [activeSection, setActiveSection] = useState("bookings");
+  const [activeSection, setActiveSection] = useState("profile");
 
   return (
     <div className="container mx-auto">

@@ -148,6 +148,8 @@ app.get("/", (req, res) => {
   res.send("Hello Kanishka");
 });
 
+// export for socket use elsewhere
+export { io, users };
 // Start Server
 const PORT = process.env.HOST_PORT || 5000;
 

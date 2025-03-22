@@ -15,7 +15,7 @@ export const editUser = async (req, res) => {
     } = req.body;
 
     if (Array.isArray(imageUrl) && imageUrl.length > 0) {
-      imageUrl = imageUrl[0]; 
+      imageUrl = imageUrl[0];
     }
 
     const updatedUser = await User.findByIdAndUpdate(
@@ -45,10 +45,46 @@ export const editUser = async (req, res) => {
       data: updatedUser,
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(500).json({
       success: false,
       message: "An error occurred while updating user",
+      error: error.message,
+    });
+  }
+};
+
+export const editBillingAddress = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { billingAddress, billingCity, billingPhoneNumber } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      {
+        billingAddress,
+        billingCity,
+        billingPhoneNumber,
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Billing address updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while updating Billing address",
       error: error.message,
     });
   }

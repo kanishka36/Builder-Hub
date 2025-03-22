@@ -11,7 +11,6 @@ import { toast } from "react-toastify";
 import FileUpload from "../../../components/Form/FileUpload";
 
 const EditProducts = () => {
-
   const { state } = useLocation(); // Get the passed product data
   const navigate = useNavigate();
 
@@ -33,9 +32,21 @@ const EditProducts = () => {
     quantity: product?.quantity || "",
   };
 
+  // Validation Schema
+  const validationSchema = Yup.object({
+    name: Yup.string().required("Product name is required"),
+    description: Yup.string().required("Description is required"),
+    price: Yup.number()
+      .typeError("Price should be a number")
+      .required("Price is required"),
+    quantity: Yup.number()
+      .typeError("Quantity should be a number")
+      .required("Quantity is required"),
+  });
+
   const apiUrl = import.meta.env.VITE_ROUTE_URL;
 
-  const {productId} = useParams();
+  const { productId } = useParams();
 
   // Handle Form Submission
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
@@ -48,7 +59,7 @@ const EditProducts = () => {
         position: "top-center",
         autoClose: 1500,
       });
-      navigate('/dashboard/products')
+      navigate("/dashboard/products");
       resetForm();
     } catch (error) {
       console.error("Error adding product:", error);
@@ -56,18 +67,6 @@ const EditProducts = () => {
     }
     setSubmitting(false);
   };
-
-  // Validation Schema
-  const validationSchema = Yup.object({
-    name: Yup.string().required("Product name is required"),
-    description: Yup.string().required("Description is required"),
-    price: Yup.number()
-      .typeError("Price should be a number")
-      .required("Price is required"),
-    quantity: Yup.number()
-      .typeError("Quantity should be a number")
-      .required("Quantity is required"),
-  });
 
   return (
     <div className="">

@@ -33,6 +33,7 @@ import AddProduct from "./pages/Seller/Supply/AddProducts"
 import EditProducts from "./pages/Seller/Supply/EditProducts";
 import CProductDetails from "./pages/Customer/CProductDetails";
 import CCart from "./pages/Customer/CCart";
+import OrderDetails from "./pages/Seller/Supply/OrderDetails";
 
 function App() {
   return (

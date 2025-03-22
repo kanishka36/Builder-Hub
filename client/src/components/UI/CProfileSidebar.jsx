@@ -15,6 +15,7 @@ const CProfileSidebar = ({ setActiveSection }) => {
   const menu = [
     { name: "My Profile", section: "profile" },
     { name: "My Bookings", section: "bookings" },
+    { name: "My Orders", section: "orders" },
   ];
 
   const logout = async () => {

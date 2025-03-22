@@ -4,6 +4,7 @@ import { Product } from "../model/product.model.js";
 
 export const createOrderFromCart = async (req, res) => {
   const customerId = req.user.id;
+  const { orderId, billingAddress } = req.body;
 
   try {
     const cart = await Cart.findOne({ customerId });
@@ -25,16 +26,24 @@ export const createOrderFromCart = async (req, res) => {
         .json({ success: false, message: "Insufficient product stock" });
     }
 
+    if (!billingAddress) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Billing Address Required" });
+    }
+
     const newOrder = new Order({
       customerId,
+      orderId: orderId,
       seller: product.seller, // ✅ fixed: get seller from product
       items: [cartItem],
+      billingAddress,
       totalQuantity: cartItem.quantity,
       totalPrice: cartItem.quantity * cartItem.priceAtTime,
       paymentStatus: "Paid",
     });
 
-    product.stock -= cartItem.quantity;
+    product.quantity -= cartItem.quantity;
     await product.save();
     await newOrder.save();
 
@@ -59,7 +68,7 @@ export const createOrderFromCart = async (req, res) => {
 
 export const createOrderFromBuyNow = async (req, res) => {
   const customerId = req.user.id;
-  const { productId, quantity } = req.body;
+  const { productId, quantity, orderId, billingAddress } = req.body;
 
   try {
     const product = await Product.findById(productId);
@@ -69,6 +78,12 @@ export const createOrderFromBuyNow = async (req, res) => {
       return res
         .status(400)
         .json({ success: true, message: "Insufficient product stock" });
+    }
+
+    if (!billingAddress) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Billing Address Required" });
     }
 
     const priceAtTime = product.price;
@@ -84,14 +99,16 @@ export const createOrderFromBuyNow = async (req, res) => {
 
     const newOrder = new Order({
       customerId,
+      orderId: orderId,
       seller: product.seller,
       items: [orderItem],
+      billingAddress,
       totalQuantity,
       totalPrice,
       paymentStatus: "Paid",
     });
 
-    product.stock -= quantity;
+    product.quantity -= quantity;
     await product.save();
     await newOrder.save();
 
@@ -115,7 +132,9 @@ export const viewUserOrders = async (req, res) => {
   const customerId = req.user.id;
 
   try {
-    const orders = await Order.find({ customerId }).sort({ createdAt: -1 });
+    const orders = await Order.find({ customerId })
+      .sort({ createdAt: -1 })
+      .populate("items.productId");
     res.status(200).json({
       success: true,
       message: "Order Items retreived successfully",
@@ -132,7 +151,6 @@ export const viewUserOrders = async (req, res) => {
 
 export const viewSellerOrders = async (req, res) => {
   const sellerId = req.user.id;
-
   try {
     const orders = await Order.find({ seller: sellerId })
       .sort({ createdAt: -1 })
@@ -155,5 +173,31 @@ export const viewSellerOrders = async (req, res) => {
       message: "Failed to fetch orders",
       error: error.message,
     });
+  }
+};
+
+export const updateOrderStatus = async (req, res) => {
+  const { orderId } = req.params;
+  const { status } = req.body;
+
+  try {
+    const order = await Order.findOneAndUpdate(
+      { orderId },
+      {
+        orderStatus: status,
+        isDelivered: status === "Delivered",
+        deliveredAt: status === "Delivered" ? new Date() : null,
+      },
+      { new: true }
+    );
+
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+    res.status(200).json({ success: true, data: order });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
   }
 };

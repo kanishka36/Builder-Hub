@@ -33,6 +33,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    billingAddress: {
+      type: String,
+    },
+    billingCity: {
+      type: String,
+    },
+    billingPhoneNumber: {
+      type: Number,
+    },
     imageUrl: {
       type: String,
     },

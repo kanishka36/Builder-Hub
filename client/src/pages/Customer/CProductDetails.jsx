@@ -59,6 +59,13 @@ const ProductPage = () => {
 
   //payment
   const handleCheckout = async () => {
+    if (!currentUser?.billingAddress) {
+      toast.error("Please Add Your Billing Address", {
+        position: "top-center",
+        autoClose: 1500,
+      });
+      return;
+    }
     handlePayment({
       type: "product",
       itemTitle: product.name,
@@ -66,11 +73,21 @@ const ProductPage = () => {
       customer: currentUser,
       sellerId: product.seller._id,
       onSuccess: async (orderId) => {
-        console.log("Product payment success!", orderId);
+        const fullName = currentUser?.firstName + " " + currentUser.lastName;
         try {
           const res = await axios.post(
             `${apiUrl}/api/add-order/buy-now`,
-            { productId: product, quantity: quantity },
+            {
+              productId: product,
+              quantity: quantity,
+              orderId: orderId,
+              billingAddress: {
+                fullName: fullName,
+                address: currentUser.billingAddress,
+                city: currentUser.billingCity,
+                phone: currentUser.billingPhoneNumber,
+              },
+            },
             { withCredentials: true }
           );
           if (res.data.success === true) {
